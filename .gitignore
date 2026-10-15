@@ -1,0 +1,20 @@
+node_modules/
+dist/
+.turbo/
+.wrangler/
+coverage/
+playwright-report/
+test-results/
+*.tsbuildinfo
+.env.local
+.env.*.local
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+# OpenTofu
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+.DS_Store

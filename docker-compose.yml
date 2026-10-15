@@ -1,0 +1,19 @@
+# Local stand-ins for AWS services. `pnpm dev` starts what a project needs.
+services:
+  dynamodb-local:
+    image: amazon/dynamodb-local:3.3.1
+    command: -jar DynamoDBLocal.jar -sharedDb -inMemory
+    ports: ["8100:8000"] # host 8100: 8000 is a common dev-server port
+
+  postgres:
+    profiles: [pg]
+    image: postgres:17.11-alpine
+    environment:
+      POSTGRES_USER: dr4w
+      POSTGRES_PASSWORD: dr4w
+      POSTGRES_DB: dr4w
+    ports: ["5432:5432"]
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "dr4w"]
+      interval: 2s
+      retries: 15

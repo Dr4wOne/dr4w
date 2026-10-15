@@ -1,0 +1,9 @@
+{
+  "name": "__NAME__",
+  "subdomain": "__SUBDOMAIN__",
+  "db": "dynamo",
+  "uses": [],
+  "exposes": {},
+  "status": "poc",
+  "ports": { "web": __WEB_PORT__, "api": __API_PORT__ }
+}

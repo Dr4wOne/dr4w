@@ -1,0 +1,9 @@
+{
+  "name": "hello",
+  "subdomain": "hello",
+  "db": "dynamo",
+  "uses": [],
+  "exposes": {},
+  "status": "poc",
+  "ports": { "web": 5173, "api": 8787 }
+}

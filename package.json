@@ -1,0 +1,29 @@
+{
+  "name": "dr4w",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.11.2",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "scripts": {
+    "dev": "tsx scripts/dev.ts",
+    "new": "tsx scripts/new-project.ts",
+    "seed": "tsx scripts/seed.ts",
+    "changed": "tsx scripts/changed-projects.ts",
+    "build": "turbo run build",
+    "lint": "biome check .",
+    "format": "biome check --write .",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "check": "pnpm lint && turbo run typecheck test build"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "catalog:",
+    "@types/node": "catalog:",
+    "tsx": "catalog:",
+    "turbo": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
