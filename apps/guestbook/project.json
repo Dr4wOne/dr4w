@@ -1,0 +1,12 @@
+{
+  "name": "guestbook",
+  "subdomain": "guestbook",
+  "db": "dynamo",
+  "uses": [],
+  "exposes": {},
+  "status": "live",
+  "ports": {
+    "web": 5175,
+    "api": 8789
+  }
+}
