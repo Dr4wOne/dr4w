@@ -19,7 +19,6 @@ env:
   AWS_REGION: us-east-1
   DEPLOY_ROLE: arn:aws:iam::809411919562:role/dr4w-ci-deploy
   TURBO_TELEMETRY_DISABLED: '1'
-  WRANGLER_SEND_METRICS: 'false'
 
 jobs:
   destroy:
@@ -54,19 +53,23 @@ jobs:
           role-to-assume: ${{ env.DEPLOY_ROLE }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Delete the Worker (and its custom domain)
-        working-directory: apps/${{ inputs.project }}/web
+      - name: Delete the Worker and its custom domains (Cloudflare API)
+        # Not `wrangler delete`: it also lists KV namespaces, which the dr4w-ci token can't read.
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          # --force skips the interactive prompt (dependants were checked above).
-          if ! out=$(pnpm exec wrangler delete "dr4w-$P" --force 2>&1); then
-            echo "$out"
-            grep -qiE 'not found|does not exist|code: 10007' <<<"$out" || exit 1
-            echo "Worker already gone — continuing"
-          fi
-          echo "$out"
+          api() { curl -sS -X "$1" -H "Authorization: Bearer $CF_TOKEN" "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT$2"; }
+          ok() { jq -e '.success or any(.errors[]?; .code == 10007)' >/dev/null; }   # 10007 = not found
+          domains=$(api GET "/workers/domains?service=dr4w-$P")
+          echo "$domains" | jq -e .success >/dev/null || { echo "$domains" | jq -c .errors; exit 1; }
+          for id in $(echo "$domains" | jq -r '.result[].id'); do
+            api DELETE "/workers/domains/$id" | ok || { echo "failed to remove custom domain $id"; exit 1; }
+            echo "removed custom domain $id"
+          done
+          res=$(api DELETE "/workers/scripts/dr4w-$P?force=true")
+          echo "$res" | jq -c '{success, errors}'
+          echo "$res" | ok
 
       - name: tofu destroy
         working-directory: apps/${{ inputs.project }}/infra
