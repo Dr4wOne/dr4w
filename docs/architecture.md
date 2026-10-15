@@ -84,7 +84,8 @@ apps/<p>/api/src/
   app.ts          // new Hono().basePath('/api').use(kit middlewares).route('/notes', notes) …
   routes/notes.ts // export const notes = new Hono().get(…).post(…)   (chained → RPC types)
   routes/*.test.ts// app.request('/api/notes', …) against dynamodb-local
-  lambda.ts       // export const handler = handle(app)          (hono/aws-lambda)
+  events.ts       // onEvent(Def, handler)[] — dr4w-bus events this project consumes
+  lambda.ts       // createLambdaHandler(app, events): API GW → Hono, EventBridge → events
   local.ts        // serve({ fetch: app.fetch, port })           (@hono/node-server)
   env.ts          // zod-parsed process.env (TABLE_NAME, BUS_NAME, …)
 ```
@@ -150,9 +151,13 @@ min 0 / max 2 ACU, auto-pause 300 s, Data API, default VPC, deletion protection,
 - **Async (preferred):** `PutEvents` on `dr4w-bus`, `source = "dr4w.<project>"`,
   `detail-type = "<Entity>.<Event>.v1"`, `detail` validated by the zod schema in
   `packages/contracts/events/<project>.ts`. Breaking change ⇒ new `vN` type, publish both for a while.
-- Locally, `publish()` with `BUS_NAME` unset logs the event and, if the consumer project is also
-  running, POSTs it to the consumer's `/api/_events` local dev hook (dev-only route, not mounted
-  in Lambda). Good enough to exercise M4 offline.
+- Consumers handle events in the **same** Lambda (one per project): `createLambdaHandler`
+  dispatches EventBridge envelopes by `source` + `detail-type` to `src/events.ts`.
+  Cron schedules use the same envelope shape (`source = dr4w.cron`).
+- Locally, `publish()` with `BUS_NAME` unset logs the event and POSTs it to every running consumer
+  that the provider exposes `events` to (`scripts/dev.ts` sets `DEV_EVENT_TARGETS`); the consumer's
+  dev-only `/api/_events` route (mounted in `local.ts`, never in Lambda) dispatches it.
+- Full guide with the hello → echo example: `docs/connecting-projects.md`.
 
 ## 7. CI/CD
 

@@ -1,0 +1,12 @@
+{
+  "name": "echo",
+  "subdomain": "echo",
+  "db": "dynamo",
+  "uses": ["hello"],
+  "exposes": {},
+  "status": "poc",
+  "ports": {
+    "web": 5174,
+    "api": 8788
+  }
+}

@@ -1,4 +1,6 @@
-import { handle } from 'hono/aws-lambda'
+import { createLambdaHandler } from '@dr4w/api-kit'
 import { app } from './app.ts'
+import { events } from './events.ts'
 
-export const handler = handle(app)
+// API Gateway requests → Hono app; dr4w-bus events → ./events.ts
+export const handler = createLambdaHandler(app, events)
