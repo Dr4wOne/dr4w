@@ -3,7 +3,7 @@
 Personal idea-to-launch platform: one monorepo, many small projects, ~$0 idle cost.
 Each project is a React SPA on a Cloudflare Worker that proxies `/api/*` to one Hono Lambda on AWS.
 
-> Status: M1 (local dev) and M2 (bootstrap + platform) done; M3 (first deploy) in review — see `docs/tasks.md`.
+> Status: M1–M3 done — `hello` is live at https://hello.dr4w.io. Next: M4 (second project + events). See `docs/tasks.md`.
 
 ## Requirements
 

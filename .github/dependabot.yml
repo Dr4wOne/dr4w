@@ -4,6 +4,10 @@ updates:
     directory: /
     schedule: { interval: weekly }
     cooldown: { default-days: 3 } # matches pnpm's minimum release age policy
+    ignore:
+      # Types follow the Node runtime (24 = Lambda nodejs24.x); bump together with .nvmrc.
+      - dependency-name: '@types/node'
+        update-types: [version-update:semver-major]
     groups:
       minor-and-patch:
         update-types: [minor, patch]
