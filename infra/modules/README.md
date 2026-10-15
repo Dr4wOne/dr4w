@@ -16,4 +16,4 @@ Projects compose these in `apps/<p>/infra/main.tf`. Every module names resources
 | `pg-database` | DB + role in the shared Aurora cluster (Data API), secret | `pg_database`, `pg_secret_arn`; Data API statements |
 
 Examples: `apps/hello/infra` (api + table + events out), `apps/echo/infra` (api + table +
-event-subscription + project-ref). Guide: `docs/connecting-projects.md`.
+event-subscription + project-ref). Guide: `docs/guides/connect-projects.md`.

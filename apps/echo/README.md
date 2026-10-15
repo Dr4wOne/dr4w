@@ -1,16 +1,21 @@
 # echo
 
-Live at `https://echo.dr4w.io` (once `status` in `project.json` is `live`).
+Counts the notes created in `hello`, live, from `Note.Created.v1` events on `dr4w-bus`.
 
-| Part | Path | Notes |
-|---|---|---|
-| API | `api/` | Hono app. Routes in `api/src/routes/`, mounted in `api/src/app.ts` |
-| Web | `web/` | Vite + React SPA; `web/worker/index.ts` serves it and proxies `/api/*` |
-| Infra | `infra/` | Table schema in `infra/tables.json` |
+**Live:** https://echo.dr4w.io · **Status:** see `project.json` · **Agent notes:** `CLAUDE.md`
 
+## Run locally
 ```bash
-pnpm --filter echo dev        # web http://localhost:5174 · api http://localhost:8788
+pnpm dev hello echo                     # web http://localhost:5174 · api http://localhost:8788
 pnpm --filter "./apps/echo/**" test
 ```
 
-Add an endpoint: `/endpoint echo GET /things`. Add infra: `/resource echo table|queue|bucket|cron|event`.
+## Parts
+| Part | Path |
+|---|---|
+| API (Hono) | `api/src/` — routes in `api/src/routes/`, mounted in `api/src/app.ts` |
+| Web (React + proxy Worker) | `web/src/`, `web/worker/index.ts` |
+| Infra (OpenTofu) | `infra/main.tf`, tables in `infra/tables.json` |
+| Smoke test | `web/e2e/smoke.spec.ts` |
+
+Add an endpoint: `/endpoint echo GET /api/things`. Add infra: `/resource echo table|queue|bucket|cron|event`.

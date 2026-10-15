@@ -27,7 +27,7 @@ variable "spec" {
 }
 
 variable "deletion_protection" {
-  description = "Turn off (apply) before destroying a project — see docs/runbook.md."
+  description = "Turn off (apply) before destroying a project — see docs/guides/destroy-project.md."
   type        = bool
   default     = true
 }

@@ -1,7 +1,7 @@
 name: destroy
 
 # Permanently removes a project's cloud resources (Worker + custom domain, Lambda, API, tables…).
-# Afterwards delete apps/<project> in a PR. Runbook: docs/runbook.md.
+# Afterwards delete apps/<project> in a PR. Guide: docs/guides/destroy-project.md.
 on:
   workflow_dispatch:
     inputs:

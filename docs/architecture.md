@@ -1,7 +1,7 @@
 # dr4w — Architecture
 
 Personal idea-to-launch platform. One monorepo, many small projects, ~$0 idle cost.
-Source of truth for requirements: `docs/SPEC.md`. This file records **how** and **why**.
+Requirements: `docs/SPEC.md`. Versions: `docs/stack.md`. Why: `docs/decisions/`. Layout: `docs/repo-map.md`.
 
 ## 1. Big picture
 
@@ -38,7 +38,7 @@ creates `<subdomain>.dr4w.io` Worker custom domains and must never touch the ape
 ## 2. Request path & proxy security
 
 1. Browser calls `/api/notes` on its own origin → no CORS anywhere.
-2. Worker (`web/worker.ts`) forwards `/api/*` to `env.API_ORIGIN` (wrangler var, set at deploy
+2. Worker (`web/worker/index.ts`) forwards `/api/*` to `env.API_ORIGIN` (wrangler var, set at deploy
    from the tofu output `api_url`), adds `X-Origin-Secret: env.ORIGIN_SECRET`, strips any
    incoming `X-Origin-Secret` from the client. Everything else → `env.ASSETS` (SPA fallback).
 3. Lambda: `api-kit` `originSecret()` middleware does a constant-time compare
@@ -52,15 +52,7 @@ request still invokes Lambda (cost capped by API GW throttling).
 
 ## 3. Repository layout
 
-As in SPEC §4. Additions/clarifications:
-
-| Path | Purpose |
-|---|---|
-| `apps/<p>/project.json` | `name, subdomain, db, uses[], exposes{}, status, ports{web,api}` |
-| `apps/<p>/infra/tables.json` | DynamoDB key schema + GSIs; read by tofu (`jsondecode`) and `scripts/seed.ts` |
-| `scripts/changed-projects.ts` | git diff → JSON list of projects for CI matrices |
-| `scripts/new-project.ts` | `pnpm new <name>`: copy `templates/project`, replace tokens, assign ports |
-| `infra/modules/_shared/` | not a module — conventions doc for naming/tags (README only) |
+Folder-by-folder: `docs/repo-map.md`. Per-project layout and naming: `docs/conventions.md`.
 
 ### `project.json`
 ```json
@@ -157,7 +149,7 @@ min 0 / max 2 ACU, auto-pause 300 s, Data API, default VPC, deletion protection,
 - Locally, `publish()` with `BUS_NAME` unset logs the event and POSTs it to every running consumer
   that the provider exposes `events` to (`scripts/dev.ts` sets `DEV_EVENT_TARGETS`); the consumer's
   dev-only `/api/_events` route (mounted in `local.ts`, never in Lambda) dispatches it.
-- Full guide with the hello → echo example: `docs/connecting-projects.md`.
+- Full guide with the hello → echo example: `docs/guides/connect-projects.md`.
 
 ## 7. CI/CD
 
@@ -186,34 +178,6 @@ Dependabot for npm, github-actions, terraform (`infra/**`).
 `pnpm dev:cloud <p>`: same API process with `AWS_PROFILE=dr4w`, env read from SSM, no
 `DYNAMO_ENDPOINT`. Linux/macOS; Windows via WSL2.
 
-## 9. Tooling versions (checked 2026-10-14, pinned in lockfiles)
+## 9. Versions and decisions
 
-node 24 LTS (Lambda runtime `nodejs24.x`, verified; `nodejs26.x` is preview-only until ~Nov 2026) · pnpm 12 · turbo 2.11 ·
-TypeScript 7.0 · Vite 8 · React 19.3 · `@cloudflare/vite-plugin` 1.64 · wrangler 4.151 ·
-Hono 4.13 · `@hono/node-server` 2.1 · zod 4.6 · Vitest 5 · Playwright 1.64 · esbuild 0.28 ·
-Biome 2.5 (lint + format) · AWS SDK v3 · OpenTofu 1.13 · hashicorp/aws ~> 6.69.
-
-Notes from M1:
-- pnpm 12 enforces a minimum release age (~1 day) and blocks install scripts; allowed builds
-  (`esbuild`, `workerd`) are listed under `allowBuilds` in `pnpm-workspace.yaml`.
-- Cloudflare's new `cf` CLI is in open beta (Sept 2026); we stay on `wrangler` until it is GA.
-- dynamodb-local is published on host port **8100** (8000 is a common dev-server port).
-- With `@cloudflare/vite-plugin`, `vite build` writes `dist/client` + a generated
-  `dist/<worker>/wrangler.json`; `wrangler deploy` picks that up automatically.
-
-## 10. Decision log
-
-| # | Decision | Why |
-|---|---|---|
-| D1 | **Repo is public.** Deploy role trusts only `environment:production` (as SPEC); Cloudflare secrets are environment secrets; `production` has no required reviewers and deploys only from `main` (deployment branch rule). Branch protection on `main` requires CI. | `Dr4wOne` is on GitHub Free, where environments/branch protection exist only for public repos. Consequences: `ideas/` and code are public (no secrets ever committed — already a rule); fork PRs get no OIDC token or secrets, and the "require approval for fork PR workflows" setting must be on. |
-| D2 | Biome instead of ESLint + Prettier | One dev dependency, one config, fast. |
-| D3 | `@cloudflare/vite-plugin` for web dev/build | Runs `worker.ts` locally in workerd; build output is what `wrangler deploy` ships. |
-| D4 | Explicit `.route()` mount per endpoint | Keeps Hono RPC end-to-end types. |
-| D5 | Origin secret in SSM, read by Lambda at cold start | Not visible in Lambda config to read-only principals. |
-| D6 | `exposes` grant vocabulary + `project-ref` preconditions | Cross-project access is opt-in by the provider and fails at `plan`, not at runtime. |
-| D7 | `reserved_concurrency` default `null` | AWS rejects reservations that leave < 100 unreserved; new accounts may have a 10 limit. Set to 10 once quota ≥ 1000 (`docs/bootstrap.md` explains). API GW throttling is the always-on cap. |
-| D8 | Root `dr4w.io` untouched | Owned by `dr4w-landpage`. A "live projects" page is a later idea. |
-| D9 | `pg-database` uses Data API + per-project Secrets Manager secret | Data API requires a Secrets Manager secret (~$0.40/mo each). Only paid when PG is enabled. |
-| D10 | CI still plans only changed projects | Public repo has unlimited standard-runner minutes, but fast CI is still nicer; turbo cache via `actions/cache`. |
-| D11 | **Single shared AWS account `809411919562`** (no separate dr4w account) | Your choice. Isolation relies on `dr4w-*` naming, the CI policies and `dr4w-boundary`. The budget/alerts cover the whole account. |
-| D12 | Lambda code ships via a per-project S3 artifacts bucket (`dr4w-<p>-<env>-artifacts-<acct>`, 30-day expiry) | Inline zip uploads failed on the first deploy (`bufio.Scanner: token too long` in the AWS provider's request logging). S3 is also the path that scales past 50 MB. |
+Pinned versions: `docs/stack.md`. Every decision with its context and trade-offs: `docs/decisions/` (index: `docs/decisions/README.md`).
