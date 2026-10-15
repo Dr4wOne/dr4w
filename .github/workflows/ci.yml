@@ -31,8 +31,9 @@ jobs:
 
   plan:
     needs: check
-    # Fork PRs get no OIDC token; their plans run after merge review instead.
-    if: github.event.pull_request.head.repo.full_name == github.repository
+    # Fork and Dependabot PRs get no OIDC token, so plan is skipped (skipped = passing check).
+    # Their changes are still planned+applied by deploy.yml after merge.
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]'
     runs-on: ubuntu-24.04
     permissions:
       contents: read
