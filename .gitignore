@@ -13,6 +13,7 @@ test-results/
 !.dev.vars.example
 # OpenTofu
 .terraform/
+.build/
 *.tfstate
 *.tfstate.*
 *.tfplan

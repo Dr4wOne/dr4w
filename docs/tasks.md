@@ -35,16 +35,16 @@ Each task is small, ends in a verifiable check, and is ticked when done.
 - [x] 2.4 `docs/bootstrap.md`: exact steps for SPEC §11 (aws-cli ≥ 2.9 upgrade, Identity Center + `aws configure sso --profile dr4w`, root MFA, Cloudflare token scopes, GitHub repo `Dr4wOne/dr4w` + repo secrets, Lambda concurrency quota check/increase, bootstrap apply + state migration, confirm SNS).
 - [x] 2.5a Bootstrap applied 2026-10-14 (16 resources), state migrated to S3. Lambda quota 10 → increase to 1000 requested.
 - [x] 2.5 Platform applied 2026-10-14 (8 resources: dr4w-bus + archive, dr4w-alerts, dr4w-monthly budget, 3 SSM params).
-- [ ] 2.6 ⏸ You confirm the SNS subscription email. ✓ budget visible.
+- [x] 2.6 SNS subscription confirmed. Lambda quota increase to 1000 still pending (case opened).
 
 ## M3 — First deploy (`hello`)
 
-- [ ] 3.1 `infra/modules/project-api` (Lambda, role+boundary, HTTP API + throttling, log group 14d, alarms, origin secret, SSM outputs, `iam_statements` merge). ✓ validate.
-- [ ] 3.2 `infra/modules/dynamo-table` reading one `tables.json` entry. ✓ validate.
-- [ ] 3.3 `apps/hello/infra/main.tf` wiring; `api` build script (esbuild → `dist/lambda.mjs`). ✓ `tofu plan` locally (SSO) shows expected resources only.
-- [ ] 3.4 `.github/workflows/ci.yml` (SHA-pinned actions, plan comment). ✓ opens on a test PR.
-- [ ] 3.5 `.github/workflows/deploy.yml` + `platform.yml` + `.github/dependabot.yml`.
-- [ ] 3.6 Playwright smoke (`/api/health` 200, home page renders, create+list note). Lives in `apps/<p>/web/e2e`, run against `BASE_URL`.
+- [x] 3.1 `infra/modules/project-api` (Lambda, role+boundary, HTTP API + throttling, log group 14d, alarms, origin secret, SSM outputs, `iam_statements` merge). ✓ validate.
+- [x] 3.2 `infra/modules/dynamo-table` reading one `tables.json` entry. ✓ validate.
+- [x] 3.3 `apps/hello/infra/main.tf` wiring; `api` build script (esbuild → `dist/lambda.mjs`). ✓ `tofu plan` locally (SSO) shows expected resources only.
+- [x] 3.4 `.github/workflows/ci.yml` (SHA-pinned actions, plan comment). ✓ opens on a test PR.
+- [x] 3.5 `.github/workflows/deploy.yml` + `platform.yml` + `.github/dependabot.yml`.
+- [x] 3.6 Playwright smoke (`/api/health` 200, home page renders, create+list note). Lives in `apps/<p>/web/e2e`, run against `BASE_URL`.
 - [ ] 3.7 ⏸ On your **"go"**: merge to `main` → deploy. ✓ `https://hello.dr4w.io` live, smoke green, `curl <execute-api>/api/notes` → 403, `/api/health` → 200.
 
 ## M4 — Second project + connection (`echo`)

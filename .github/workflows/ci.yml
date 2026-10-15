@@ -1,0 +1,86 @@
+name: ci
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.head_ref }}
+  cancel-in-progress: true
+
+env:
+  AWS_REGION: us-east-1
+  PLAN_ROLE: arn:aws:iam::809411919562:role/dr4w-ci-plan
+  TURBO_TELEMETRY_DISABLED: '1'
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup
+      - run: pnpm lint
+      - run: pnpm turbo run typecheck test build
+      - uses: opentofu/setup-opentofu@a1320f892987e89d278cc92dc5adc984fb93aca4 # v2.0.2
+        with:
+          tofu_version_file: .opentofu-version
+          tofu_wrapper: false
+      - run: pnpm infra:check
+
+  plan:
+    needs: check
+    # Fork and Dependabot PRs get no OIDC token, so plan is skipped (skipped = passing check).
+    # Their changes are still planned+applied by deploy.yml after merge.
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup
+      - id: changed
+        run: echo "projects=$(pnpm -s changed origin/${{ github.base_ref }})" >> "$GITHUB_OUTPUT"
+      - if: steps.changed.outputs.projects != '[]'
+        uses: opentofu/setup-opentofu@a1320f892987e89d278cc92dc5adc984fb93aca4 # v2.0.2
+        with:
+          tofu_version_file: .opentofu-version
+          tofu_wrapper: false
+      - if: steps.changed.outputs.projects != '[]'
+        uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ env.PLAN_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: tofu plan (changed projects)
+        if: steps.changed.outputs.projects != '[]'
+        env:
+          PROJECTS: ${{ steps.changed.outputs.projects }}
+        run: |
+          echo "## OpenTofu plan" > "$RUNNER_TEMP/plan.md"
+          for p in $(echo "$PROJECTS" | jq -r '.[]'); do
+            pnpm --filter "$p-api" build
+            cd "apps/$p/infra"
+            tofu init -input=false -backend-config=../../../infra/backend.hcl >/dev/null
+            set +e
+            tofu plan -input=false -no-color -lock-timeout=2m > "$RUNNER_TEMP/$p.txt" 2>&1
+            code=$?
+            set -e
+            summary=$(grep -E '^(Plan:|No changes\.|Error:)' "$RUNNER_TEMP/$p.txt" | head -3)
+            { echo "### \`$p\` — ${summary:-see logs}"; echo '<details><summary>plan</summary>'; echo;
+              echo '```'; tail -c 20000 "$RUNNER_TEMP/$p.txt"; echo '```'; echo '</details>'; } >> "$RUNNER_TEMP/plan.md"
+            cd - >/dev/null
+            [ "$code" -eq 0 ] || { cat "$RUNNER_TEMP/$p.txt"; exit "$code"; }
+          done
+      - name: Comment plan on PR
+        if: steps.changed.outputs.projects != '[]'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          gh pr comment "$PR" --edit-last --body-file "$RUNNER_TEMP/plan.md" \
+            || gh pr comment "$PR" --body-file "$RUNNER_TEMP/plan.md"

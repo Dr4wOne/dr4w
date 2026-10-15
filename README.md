@@ -3,7 +3,7 @@
 Personal idea-to-launch platform: one monorepo, many small projects, ~$0 idle cost.
 Each project is a React SPA on a Cloudflare Worker that proxies `/api/*` to one Hono Lambda on AWS.
 
-> Status: **M1 (local dev)** done. Cloud deploy arrives in M2–M3 — see `docs/tasks.md`.
+> Status: M1 (local dev) and M2 (bootstrap + platform) done; M3 (first deploy) in review — see `docs/tasks.md`.
 
 ## Requirements
 
@@ -19,6 +19,7 @@ pnpm dev hello            # or just `pnpm dev` to pick; runs fully offline
 
 pnpm new myproject        # scaffold apps/myproject from templates/project
 pnpm check                # lint + typecheck + test + build (everything)
+pnpm infra:check          # tofu fmt + validate for every stack (offline)
 ```
 
 `pnpm dev` starts `dynamodb-local` (Docker, host port 8100) and creates the project's tables
@@ -34,7 +35,8 @@ from `apps/<p>/infra/tables.json`. Data is in-memory: restarting the container c
 | `packages/web-kit` | Typed API client (`createApi`, `unwrap`) + tiny UI basics |
 | `templates/project` | What `pnpm new` copies |
 | `scripts/` | `new`, `dev`, `seed`, `changed`, Lambda build |
-| `infra/` | OpenTofu bootstrap, platform and modules (M2+) |
+| `infra/` | OpenTofu: `bootstrap` (once, local), `platform` (shared), `modules/` (per-project building blocks) |
+| `.github/workflows` | `ci` (PR checks + plan comment), `deploy` (push to main), `platform` (manual) |
 | `docs/` | `SPEC.md` (requirements), `architecture.md` (how/why), `tasks.md` (progress) |
 
 ## Common tasks
