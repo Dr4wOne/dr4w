@@ -34,7 +34,8 @@ Each task is small, ends in a verifiable check, and is ticked when done.
 - [x] 2.3 `infra/platform`: bus + archive, SNS + email sub, budget, optional Aurora block, SSM outputs, `backend.tf`. ✓ `tofu validate`; `enable_shared_postgres=true` also validates.
 - [x] 2.4 `docs/bootstrap.md`: exact steps for SPEC §11 (aws-cli ≥ 2.9 upgrade, Identity Center + `aws configure sso --profile dr4w`, root MFA, Cloudflare token scopes, GitHub repo `Dr4wOne/dr4w` + repo secrets, Lambda concurrency quota check/increase, bootstrap apply + state migration, confirm SNS).
 - [x] 2.5a Bootstrap applied 2026-10-14 (16 resources), state migrated to S3. Lambda quota 10 → increase to 1000 requested.
-- [ ] 2.5 ⏸ You run bootstrap. Then, on your **"go"**, I run `tofu apply` for `infra/platform` with `AWS_PROFILE=dr4w`. ✓ SNS confirmed, budget visible.
+- [x] 2.5 Platform applied 2026-10-14 (8 resources: dr4w-bus + archive, dr4w-alerts, dr4w-monthly budget, 3 SSM params).
+- [ ] 2.6 ⏸ You confirm the SNS subscription email. ✓ budget visible.
 
 ## M3 — First deploy (`hello`)
 
