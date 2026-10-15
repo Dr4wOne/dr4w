@@ -1,5 +1,8 @@
 import type { Hono } from 'hono'
 import { type ClientResponse, hc } from 'hono/client'
+
+export type { InferResponseType } from 'hono/client'
+
 import type { SuccessStatusCode } from 'hono/utils/http-status'
 
 /** Typed client for a project's Hono app. Same origin: the Worker proxies `/api/*`. */

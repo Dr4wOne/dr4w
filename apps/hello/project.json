@@ -3,7 +3,12 @@
   "subdomain": "hello",
   "db": "dynamo",
   "uses": [],
-  "exposes": {},
+  "exposes": {
+    "echo": ["events"]
+  },
   "status": "poc",
-  "ports": { "web": 5173, "api": 8787 }
+  "ports": {
+    "web": 5173,
+    "api": 8787
+  }
 }

@@ -22,6 +22,16 @@ if (names.length === 0) {
   })
 }
 
+// Local event wiring: a provider's publish() POSTs to every *running* consumer that it
+// exposes `events` to (mirrors the event-subscription modules in the cloud).
+const running = names.map(readProject)
+const eventTargets = (provider: string) =>
+  running
+    .filter((c) => c.uses.includes(provider))
+    .filter((c) => readProject(provider).exposes[c.name]?.includes('events'))
+    .map((c) => `http://localhost:${c.ports.api}/api/_events`)
+    .join(',')
+
 const children: ChildProcess[] = []
 for (const name of names) {
   const project = readProject(name)
@@ -40,14 +50,19 @@ for (const name of names) {
   }
   await seed(name)
   console.info(`▶ ${name}: web http://localhost:${project.ports.web} · api :${project.ports.api}`)
-  children.push(run(`${name}:api`, `${name}-api`), run(`${name}:web`, `${name}-web`))
+  const targets = eventTargets(name)
+  if (targets) console.info(`  ${name} events → ${targets}`)
+  children.push(
+    run(`${name}:api`, `${name}-api`, { DEV_EVENT_TARGETS: targets }),
+    run(`${name}:web`, `${name}-web`),
+  )
 }
 
-function run(label: string, pkg: string) {
+function run(label: string, pkg: string, extraEnv: Record<string, string> = {}) {
   // Own process group, so shutdown can stop pnpm *and* the vite/tsx/workerd it spawned.
   const child = spawn('pnpm', ['--filter', pkg, 'dev'], {
     cwd: repoRoot,
-    env: process.env,
+    env: { ...process.env, ...extraEnv },
     detached: true,
   })
   const prefix = (chunk: Buffer) =>
