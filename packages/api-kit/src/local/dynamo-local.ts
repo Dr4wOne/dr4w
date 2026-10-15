@@ -14,13 +14,20 @@ async function isUp(endpoint: string) {
   }
 }
 
-/** Starts the docker-compose `dynamodb-local` service if it is not reachable, then waits. */
+/**
+ * Starts the docker-compose `dynamodb-local` service if it is not reachable, then waits.
+ * Several test suites may race to start it; a losing `compose up` is fine as long as it comes up.
+ */
 export async function ensureDynamoLocal(repoRoot: string, endpoint = 'http://localhost:8100') {
   if (await isUp(endpoint)) return
-  execFileSync('docker', ['compose', 'up', '-d', 'dynamodb-local'], {
-    cwd: repoRoot,
-    stdio: 'inherit',
-  })
+  try {
+    execFileSync('docker', ['compose', 'up', '-d', 'dynamodb-local'], {
+      cwd: repoRoot,
+      stdio: 'inherit',
+    })
+  } catch {
+    // another process is probably starting it right now — fall through and wait
+  }
   for (let i = 0; i < 60; i++) {
     if (await isUp(endpoint)) return
     await new Promise((r) => setTimeout(r, 500))
