@@ -1,7 +1,0 @@
-{
-  "main": {
-    "hashKey": "pk",
-    "rangeKey": "sk",
-    "attributes": { "pk": "S", "sk": "S" }
-  }
-}

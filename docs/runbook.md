@@ -37,7 +37,8 @@ needs it, set `point_in_time_recovery` in the `dynamo-table` module first.
 1. Remove links: no other project may list it in `uses` (and drop its `exposes` entries).
    Merge that first.
 2. Actions → **destroy** → *Run workflow*: `project = <name>`, `confirm = <name>`.
-   It deletes the Worker (+ custom domain), lifts DynamoDB deletion protection, then
+   It removes the Worker's custom domain and the Worker (Cloudflare API), lifts DynamoDB
+   deletion protection, then
    `tofu destroy`s the stack (Lambda, API, tables, SSM params, alarms, artifacts bucket).
 3. PR deleting `apps/<name>/` (and setting the idea's `status: dropped`). Merging deploys nothing.
 4. Optional: delete the leftover state object
