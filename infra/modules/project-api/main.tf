@@ -98,13 +98,47 @@ data "archive_file" "api" {
   output_path = "${path.root}/.build/${local.name}.zip"
 }
 
+# Code ships via S3, not inline: inline uploads put a multi-MB base64 line in the request,
+# which the AWS provider's request logging fails on ("bufio.Scanner: token too long").
+resource "aws_s3_bucket" "artifacts" {
+  bucket        = "dr4w-${var.project}-${var.env}-artifacts-${data.aws_caller_identity.current.account_id}"
+  force_destroy = true # only build artifacts live here
+}
+
+resource "aws_s3_bucket_public_access_block" "artifacts" {
+  bucket                  = aws_s3_bucket.artifacts.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "artifacts" {
+  bucket = aws_s3_bucket.artifacts.id
+  rule {
+    id     = "expire-old-builds"
+    status = "Enabled"
+    filter {}
+    expiration {
+      days = 30 # Lambda keeps its own copy of the code; old zips are only for debugging
+    }
+  }
+}
+
+resource "aws_s3_object" "api" {
+  bucket = aws_s3_bucket.artifacts.id
+  key    = "api/${data.archive_file.api.output_sha256}.zip"
+  source = data.archive_file.api.output_path
+}
+
 resource "aws_lambda_function" "api" {
   function_name                  = local.name
   role                           = aws_iam_role.api.arn
   runtime                        = "nodejs24.x"
   architectures                  = ["arm64"]
   handler                        = var.handler
-  filename                       = data.archive_file.api.output_path
+  s3_bucket                      = aws_s3_object.api.bucket
+  s3_key                         = aws_s3_object.api.key
   source_code_hash               = data.archive_file.api.output_base64sha256
   memory_size                    = var.memory_mb
   timeout                        = var.timeout_s
