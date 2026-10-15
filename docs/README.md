@@ -29,3 +29,4 @@
 | Debug production | `docs/guides/debugging-prod.md` |
 | Pick an infra module | `infra/modules/README.md` |
 | Use the idea pipeline | `ideas/README.md` |
+| Understand the caveman/ponytail plugins | `docs/agent-tools.md` |

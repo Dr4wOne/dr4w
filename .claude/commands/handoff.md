@@ -6,7 +6,8 @@ Make the repo remember this session. The repo is the memory (`CLAUDE.md`).
 
 1. Review the session: `git log --oneline main..HEAD`, `git diff --stat`, and what we discussed.
 2. Update `docs/STATUS.md`: "Last updated" (date + `git rev-parse --short HEAD`), Live projects,
-   In progress, Next up, Known issues (new problems, gaps, shortcuts left in code), Recent decisions.
+   In progress, Next up, Known issues (new problems, gaps, and every ponytail `shortcut:` comment
+   added this session — `git diff main...HEAD | grep -n 'shortcut:'`), Recent decisions.
 3. Decision made this session? Add `docs/decisions/NNNN-<slug>.md` (next number; Context ·
    Decision · Consequences · Status), add it to `docs/decisions/README.md` and to the top of
    STATUS → Recent decisions (keep 10).

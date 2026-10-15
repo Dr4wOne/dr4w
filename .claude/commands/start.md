@@ -8,7 +8,8 @@ Get oriented, then brief me. Read only what's needed:
 2. `git log --oneline -15`, `git status -sb`, and `gh pr list --repo Dr4wOne/dr4w` (open PRs).
 3. If a branch other than `main` is checked out, `git diff --stat main...HEAD`.
 
-Reply with a **5-line briefing**, file paths exact:
+Reply with a **5-line briefing** (caveman voice is fine — it's chat — but file paths, commands and
+branch names stay exact):
 1. Where we are (live projects, last merged change).
 2. In progress (from STATUS + current branch/PRs).
 3. Anything blocking or broken (known issues that matter now, failing CI).
