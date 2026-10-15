@@ -1,0 +1,18 @@
+// Cloudflare Worker for guestbook: serves the SPA and proxies /api/* to AWS.
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "dr4w-guestbook",
+  "main": "./worker/index.ts",
+  "compatibility_date": "2026-10-15",
+  "assets": {
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+  // Only ever a subdomain: the dr4w.io apex belongs to the landpage repo.
+  "routes": [{ "pattern": "guestbook.dr4w.io", "custom_domain": true }],
+  "workers_dev": false,
+  // API_ORIGIN is set at deploy time from the tofu output `api_url`.
+  // ORIGIN_SECRET is a secret (wrangler secret / .dev.vars locally).
+  "vars": { "API_ORIGIN": "" },
+  "observability": { "enabled": true }
+}

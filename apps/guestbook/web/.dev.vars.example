@@ -1,0 +1,3 @@
+# Copied to .dev.vars by `pnpm new` (git-ignored). Used by `vite dev` for the Worker.
+API_ORIGIN=http://localhost:8789
+ORIGIN_SECRET=dev-origin-secret
