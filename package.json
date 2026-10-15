@@ -16,7 +16,8 @@
     "format": "biome check --write .",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
-    "check": "pnpm lint && turbo run typecheck test build"
+    "check": "pnpm lint && turbo run typecheck test build",
+    "infra:check": "bash scripts/infra-check.sh"
   },
   "devDependencies": {
     "@biomejs/biome": "catalog:",

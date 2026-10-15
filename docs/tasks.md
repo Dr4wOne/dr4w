@@ -29,10 +29,10 @@ Each task is small, ends in a verifiable check, and is ticked when done.
 
 ## M2 — Bootstrap & platform
 
-- [ ] 2.1 Install OpenTofu 1.13.x (official installer, documented in `bootstrap.md`); pin via `.opentofu-version`. ✓ `tofu version`.
-- [ ] 2.2 `infra/bootstrap`: providers (aws ~> 6.69), local backend, state bucket (versioning, SSE, BPA, TLS-only, lifecycle for old versions 90d), OIDC provider, `dr4w-boundary`, `dr4w-ci-plan`, `dr4w-ci-deploy` (D1). ✓ `tofu fmt -check && tofu validate`.
-- [ ] 2.3 `infra/platform`: bus + archive, SNS + email sub, budget, optional Aurora block, SSM outputs, `backend.tf`. ✓ `tofu validate`; `enable_shared_postgres=true` also validates.
-- [ ] 2.4 `docs/bootstrap.md`: exact steps for SPEC §11 (aws-cli ≥ 2.9 upgrade, Identity Center + `aws configure sso --profile dr4w`, root MFA, Cloudflare token scopes, GitHub repo `Dr4wOne/dr4w` + repo secrets, Lambda concurrency quota check/increase, bootstrap apply + state migration, confirm SNS).
+- [x] 2.1 Install OpenTofu 1.13.x (official installer, documented in `bootstrap.md`); pin via `.opentofu-version`. ✓ `tofu version`.
+- [x] 2.2 `infra/bootstrap`: providers (aws ~> 6.69), local backend, state bucket (versioning, SSE, BPA, TLS-only, lifecycle for old versions 90d), OIDC provider, `dr4w-boundary`, `dr4w-ci-plan`, `dr4w-ci-deploy` (D1). ✓ `tofu fmt -check && tofu validate`.
+- [x] 2.3 `infra/platform`: bus + archive, SNS + email sub, budget, optional Aurora block, SSM outputs, `backend.tf`. ✓ `tofu validate`; `enable_shared_postgres=true` also validates.
+- [x] 2.4 `docs/bootstrap.md`: exact steps for SPEC §11 (aws-cli ≥ 2.9 upgrade, Identity Center + `aws configure sso --profile dr4w`, root MFA, Cloudflare token scopes, GitHub repo `Dr4wOne/dr4w` + repo secrets, Lambda concurrency quota check/increase, bootstrap apply + state migration, confirm SNS).
 - [ ] 2.5 ⏸ You run bootstrap. Then, on your **"go"**, I run `tofu apply` for `infra/platform` with `AWS_PROFILE=dr4w`. ✓ SNS confirmed, budget visible.
 
 ## M3 — First deploy (`hello`)
