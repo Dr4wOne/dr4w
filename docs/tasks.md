@@ -59,11 +59,11 @@ Each task is small, ends in a verifiable check, and is ticked when done.
 
 ## M5 — Idea pipeline & polish
 
-- [ ] 5.1 `.claude/commands/`: `idea`, `refine`, `spec`, `plan`, `poc`, `launch`, `endpoint`, `resource` (each short; frontmatter `status` updates; `/spec` only allows catalog modules).
-- [ ] 5.2 `ideas/_template/` + `scripts/ideas-status.ts` (`pnpm ideas` table).
-- [ ] 5.3 `pnpm dev:cloud <p>`.
-- [ ] 5.4 `docs/runbook.md`: rollback (re-run deploy on previous SHA / `wrangler rollback`), destroy a project (tofu destroy + `wrangler delete` + remove folder), rotate origin secret, rotate Cloudflare token, budget alert response.
-- [ ] 5.5 Final `README.md` (5-minute tour) and `CLAUDE.md` pass.
+- [x] 5.1 `.claude/commands/`: `idea`, `refine`, `spec`, `plan`, `poc`, `launch`, `endpoint`, `resource` (each short; frontmatter `status` updates; `/spec` only allows catalog modules).
+- [x] 5.2 `ideas/_template/` + `scripts/ideas-status.ts` (`pnpm ideas` table).
+- [x] 5.3 `pnpm dev:cloud <p>`.
+- [x] 5.4 `docs/runbook.md` (+ `destroy.yml` workflow, origin-secret auto-refresh on rotation): rollback (re-run deploy on previous SHA / `wrangler rollback`), destroy a project (tofu destroy + `wrangler delete` + remove folder), rotate origin secret, rotate Cloudflare token, budget alert response.
+- [x] 5.5 Final `README.md` (5-minute tour) and `CLAUDE.md` pass.
 - [ ] 5.6 Dry run of the DoD: `/idea` → `/launch` on a throwaway idea, timed (< 15 min); `/endpoint` timed (< 5 min).
-- [ ] 5.7 (Optional) `preview.yml`: `pr-<n>` stacks, Worker preview URLs, destroy on close.
+- [~] 5.7 (Optional) PR previews — **skipped** by decision (2026-10-15). State keys are already per-env (`var.env`), so it can be added later.
 - [ ] 5.8 ⏸ **M5 review**. One week later: check Cost Explorer (target $0–2/mo idle).

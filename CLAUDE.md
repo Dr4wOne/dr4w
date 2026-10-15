@@ -1,6 +1,8 @@
 # dr4w — notes for Claude
 
 Read first: `docs/tasks.md` (where we are), `docs/architecture.md` (how/why), `docs/SPEC.md` (requirements + amendments).
+Ops: `docs/runbook.md`. Connecting projects: `docs/connecting-projects.md`. Infra catalog: `infra/modules/README.md`.
+Idea pipeline: `.claude/commands/*.md` (`/idea` → `/refine` → `/spec` → `/plan` → `/poc` → `/launch`, plus `/endpoint`, `/resource`).
 
 ## Rules
 - Spec-driven: stop at every ⏸ in `docs/tasks.md` for approval.
@@ -9,6 +11,9 @@ Read first: `docs/tasks.md` (where we are), `docs/architecture.md` (how/why), `d
 - Pin versions in the `catalog:` of `pnpm-workspace.yaml`; check current docs before adding a dependency.
 - pnpm enforces a minimum release age; don't add `minimumReleaseAgeExclude` — pick an older version.
 - Never touch the `dr4w.io` apex or `www` (owned by `Dr4wOne/dr4w-landpage`).
+- `main` is protected: change it via PR (`check` + `plan` must pass). Push with
+  `git -c credential.helper= -c 'credential.helper=!gh auth git-credential' push`.
+- The `rtk` hook truncates output: use `rtk proxy <cmd>` for `tofu plan` and anything you must read in full.
 
 ## Conventions
 - TypeScript ESM everywhere; imports use `.ts` extensions; internal packages export source (no build step).
@@ -21,7 +26,7 @@ Read first: `docs/tasks.md` (where we are), `docs/architecture.md` (how/why), `d
 - Cross-project: `uses`/`exposes` in project.json; `pnpm check:projects` validates.
 
 ## Commands
-`pnpm dev [project…]` · `pnpm new <name>` · `pnpm seed <project>` · `pnpm changed [base|--all]` · `pnpm check` · `pnpm check:projects` · `pnpm infra:check`
+`pnpm dev [project…]` · `pnpm new <name>` · `pnpm seed <project>` · `pnpm changed [base|--all]` · `pnpm check` · `pnpm check:projects` · `pnpm infra:check` · `pnpm ideas` · `pnpm dev:cloud <p>`
 
 AWS locally: `AWS_PROFILE=dr4w` (SSO, `aws sso login --profile dr4w`). Never use the default profile.
 Deploy = merge to `main` (`.github/workflows/deploy.yml`): tofu apply → `wrangler deploy --var API_ORIGIN:… --secrets-file …` → Playwright smoke.
