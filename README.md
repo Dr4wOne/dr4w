@@ -3,11 +3,25 @@
 Personal idea-to-launch platform: one monorepo, many small projects, ~$0 idle cost.
 Each project is a React SPA on a Cloudflare Worker that proxies `/api/*` to one Hono Lambda on AWS.
 
-> Status: M1–M4 done — live: https://hello.dr4w.io and https://echo.dr4w.io (counts hello's notes via `dr4w-bus`). Next: M5 (idea pipeline + polish). See `docs/tasks.md`.
+> Live: https://hello.dr4w.io (notes) and https://echo.dr4w.io (counts hello's notes via `dr4w-bus`).
 
 ## Requirements
 
 Node 24 (`.nvmrc`), pnpm 12, Docker. Linux/macOS (Windows: WSL2).
+
+## From idea to live (Claude slash commands)
+
+```
+/idea a tiny guestbook for my site     → ideas/<slug>/00-idea.md
+/refine <slug>                          → ≤7 questions, keep or drop        (optional)
+/spec <slug>                            → 01-spec.md (stories, endpoints, data, infra)
+/plan <slug>                            → 02-tasks.md (≤1h tasks, each with a test)
+/poc <slug>                             → pnpm new + implementation, pnpm dev works
+/launch <slug>                          → checklist + PR; merge = deploy to <sub>.dr4w.io
+/endpoint <project> POST /api/things    → route + zod schema + test
+/resource <project> table|queue|bucket|cron|event
+```
+`pnpm ideas` shows the board. Details: `ideas/README.md`.
 
 ## 5-minute tour
 
@@ -20,7 +34,11 @@ pnpm dev hello            # or just `pnpm dev` to pick; runs fully offline
 pnpm new myproject        # scaffold apps/myproject from templates/project
 pnpm check                # lint + typecheck + test + build (everything)
 pnpm infra:check          # tofu fmt + validate for every stack (offline)
+pnpm dev:cloud hello      # local API against hello's REAL AWS resources (SSO profile dr4w)
 ```
+
+Deploy = merge a PR to `main`. CI plans changed projects on the PR; `deploy.yml` applies,
+ships the Worker and runs the Playwright smoke test. Operations: `docs/runbook.md`.
 
 `pnpm dev` starts `dynamodb-local` (Docker, host port 8100) and creates the project's tables
 from `apps/<p>/infra/tables.json`. Data is in-memory: restarting the container clears it.
@@ -36,8 +54,10 @@ from `apps/<p>/infra/tables.json`. Data is in-memory: restarting the container c
 | `templates/project` | What `pnpm new` copies |
 | `scripts/` | `new`, `dev`, `seed`, `changed`, Lambda build |
 | `infra/` | OpenTofu: `bootstrap` (once, local), `platform` (shared), `modules/` (per-project building blocks) |
-| `.github/workflows` | `ci` (PR checks + plan comment), `deploy` (push to main), `platform` (manual) |
-| `docs/` | `SPEC.md` (requirements), `architecture.md` (how/why), `tasks.md` (progress) |
+| `.github/workflows` | `ci` (PR checks + plan comment), `deploy` (push to main), `platform` + `destroy` (manual) |
+| `ideas/` | Idea → spec → plan docs, one folder per idea |
+| `.claude/commands` | The idea-pipeline slash commands |
+| `docs/` | `SPEC.md`, `architecture.md`, `tasks.md`, `bootstrap.md`, `runbook.md`, `connecting-projects.md` |
 
 ## Common tasks
 

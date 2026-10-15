@@ -166,7 +166,8 @@ min 0 / max 2 ACU, auto-pause 300 s, Data API, default VPC, deletion protection,
 | `ci.yml` | PR | pnpm install (cached) → `turbo lint typecheck test build` → `tofu fmt -check -recursive` → `tofu validate` (all stacks/modules, `-backend=false`) → `changed-projects` → matrix: `tofu plan` with `dr4w-ci-plan` → sticky PR comment |
 | `deploy.yml` | push `main` | `changed-projects` → matrix (`concurrency: deploy-<p>`, `max-parallel: 1`): build → `tofu apply` → outputs → `wrangler deploy --var API_ORIGIN:<api_url>` + origin secret → Playwright smoke vs `https://<sub>.dr4w.io` |
 | `platform.yml` | `workflow_dispatch` (main) | plan → apply `infra/platform` |
-| `preview.yml` | PR (M5, optional) | `pr-<n>` stack + Worker preview URL; destroy on close |
+| `destroy.yml` | `workflow_dispatch` (project typed twice) | refuse if used by another project → `wrangler delete --force` → lift table protection → `tofu destroy` |
+| ~~`preview.yml`~~ | — | PR previews skipped (decision 2026-10-15) |
 
 Changed projects = `apps/<p>/**` touched; **all** projects when `packages/**`, `infra/modules/**`,
 root lockfile, or `pnpm-workspace.yaml` change. Actions pinned to SHAs;

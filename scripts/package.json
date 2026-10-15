@@ -7,6 +7,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@aws-sdk/client-ssm": "catalog:",
     "@dr4w/api-kit": "workspace:*",
     "zod": "catalog:"
   },

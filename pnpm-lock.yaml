@@ -537,6 +537,9 @@ importers:
 
   scripts:
     dependencies:
+      '@aws-sdk/client-ssm':
+        specifier: 'catalog:'
+        version: 3.1150.0
       '@dr4w/api-kit':
         specifier: workspace:*
         version: link:../packages/api-kit

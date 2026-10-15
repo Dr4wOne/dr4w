@@ -12,6 +12,8 @@ module "tables" {
   env      = var.env
   key      = each.key
   spec     = each.value
+
+  deletion_protection = var.protect_data
 }
 
 module "api" {

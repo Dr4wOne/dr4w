@@ -1,0 +1,78 @@
+name: destroy
+
+# Permanently removes a project's cloud resources (Worker + custom domain, Lambda, API, tables…).
+# Afterwards delete apps/<project> in a PR. Runbook: docs/runbook.md.
+on:
+  workflow_dispatch:
+    inputs:
+      project:
+        description: Project to destroy (e.g. demo)
+        required: true
+      confirm:
+        description: Type the project name again
+        required: true
+
+permissions:
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+  DEPLOY_ROLE: arn:aws:iam::809411919562:role/dr4w-ci-deploy
+  TURBO_TELEMETRY_DISABLED: '1'
+  WRANGLER_SEND_METRICS: 'false'
+
+jobs:
+  destroy:
+    if: inputs.project == inputs.confirm
+    runs-on: ubuntu-24.04
+    environment: production
+    permissions:
+      contents: read
+      id-token: write
+    concurrency:
+      group: deploy-${{ inputs.project }}
+      cancel-in-progress: false
+    env:
+      P: ${{ inputs.project }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Refuse if missing or still used by another project
+        run: |
+          [[ "$P" =~ ^[a-z][a-z0-9-]{1,19}$ ]] || { echo "invalid project name"; exit 1; }
+          [ -f "apps/$P/project.json" ] || { echo "apps/$P not found"; exit 1; }
+          users=$(jq -r --arg p "$P" 'select(.uses | index($p)) | .name' apps/*/project.json)
+          [ -z "$users" ] || { echo "still used by: $users — remove those links first"; exit 1; }
+
+      - uses: ./.github/actions/setup
+      - uses: opentofu/setup-opentofu@a1320f892987e89d278cc92dc5adc984fb93aca4 # v2.0.2
+        with:
+          tofu_version_file: .opentofu-version
+          tofu_wrapper: false
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ env.DEPLOY_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Delete the Worker (and its custom domain)
+        working-directory: apps/${{ inputs.project }}/web
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          # --force skips the interactive prompt (dependants were checked above).
+          if ! out=$(pnpm exec wrangler delete "dr4w-$P" --force 2>&1); then
+            echo "$out"
+            grep -qiE 'not found|does not exist|code: 10007' <<<"$out" || exit 1
+            echo "Worker already gone — continuing"
+          fi
+          echo "$out"
+
+      - name: tofu destroy
+        working-directory: apps/${{ inputs.project }}/infra
+        run: |
+          pnpm --filter "$P-api" build   # archive_file needs the dist dir to evaluate the config
+          tofu init -input=false -backend-config=../../../infra/backend.hcl
+          # Lift deletion protection first (tables only), then destroy everything.
+          tofu apply -input=false -auto-approve -var protect_data=false -target=module.tables
+          tofu destroy -input=false -auto-approve -var protect_data=false

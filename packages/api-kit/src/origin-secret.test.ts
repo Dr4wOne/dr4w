@@ -25,6 +25,33 @@ describe('originSecret', () => {
   })
 })
 
+describe('secret rotation', () => {
+  it('accepts a rotated secret by re-reading once on mismatch', async () => {
+    let current = 'old'
+    const getSecret = vi.fn(async (opts?: { fresh?: boolean }) => (opts?.fresh ? current : 'old'))
+    const app = new Hono().use(originSecret({ getSecret })).get('/x', (c) => c.text('ok'))
+    current = 'new'
+    const res = await app.request('/x', { headers: { 'x-origin-secret': 'new' } })
+    expect(res.status).toBe(200)
+    expect(getSecret).toHaveBeenLastCalledWith({ fresh: true })
+  })
+
+  it('rate-limits fresh reads', async () => {
+    let n = 0
+    const env = { ORIGIN_SECRET: 'x' }
+    const get = originSecretFromEnv(env, 60_000)
+    const spy = vi.spyOn(Date, 'now')
+    spy.mockReturnValue(1_000_000)
+    await get()
+    env.ORIGIN_SECRET = `y${n++}`
+    spy.mockReturnValue(1_000_000 + 1_000) // 1s later: still cached
+    expect(await get({ fresh: true })).toBe('x')
+    spy.mockReturnValue(1_000_000 + 61_000) // >60s later: re-read
+    expect(await get({ fresh: true })).toBe('y0')
+    spy.mockRestore()
+  })
+})
+
 describe('originSecretFromEnv', () => {
   it('prefers ORIGIN_SECRET', async () => {
     expect(await originSecretFromEnv({ ORIGIN_SECRET: 'x' })()).toBe('x')
