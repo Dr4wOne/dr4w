@@ -55,7 +55,7 @@ Each task is small, ends in a verifiable check, and is ticked when done.
 - [x] 4.4 `echo`: event handler (`src/events.ts`, dispatched by the single Lambda) validates `NoteCreatedV1`, increments counter in its table; `GET /api/count`. ✓ unit test with a sample event.
 - [x] 4.5 Local path: `publish()` dev hook → `echo` `/api/_events` (dev only). ✓ both running, create note in hello → count increments.
 - [x] 4.6 `docs/connecting-projects.md` using hello→echo as the worked example.
-- [ ] 4.7 ⏸ On your **"go"**: merge → both deploy. ✓ create note on hello.dr4w.io → echo.dr4w.io count increments.
+- [x] 4.7 ⏸ On your **"go"**: merge → both deploy. ✓ create note on hello.dr4w.io → echo.dr4w.io count increments.
 
 ## M5 — Idea pipeline & polish
 
