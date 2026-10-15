@@ -1,0 +1,41 @@
+name: platform
+
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: Apply (otherwise plan only)
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: platform
+  cancel-in-progress: false
+
+jobs:
+  platform:
+    runs-on: ubuntu-24.04
+    environment: production
+    permissions:
+      contents: read
+      id-token: write
+    defaults:
+      run:
+        working-directory: infra/platform
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: opentofu/setup-opentofu@a1320f892987e89d278cc92dc5adc984fb93aca4 # v2.0.2
+        with:
+          tofu_version_file: .opentofu-version
+          tofu_wrapper: false
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: arn:aws:iam::809411919562:role/dr4w-ci-deploy
+          aws-region: us-east-1
+      - run: tofu init -input=false -backend-config=../backend.hcl
+      - run: tofu plan -input=false -lock-timeout=5m -out=platform.tfplan
+      - if: inputs.apply
+        run: tofu apply -input=false platform.tfplan

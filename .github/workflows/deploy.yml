@@ -1,0 +1,124 @@
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      project:
+        description: Project to (re)deploy, e.g. hello. Empty = all projects.
+        required: false
+
+permissions:
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+  DEPLOY_ROLE: arn:aws:iam::809411919562:role/dr4w-ci-deploy
+  TURBO_TELEMETRY_DISABLED: '1'
+  WRANGLER_SEND_METRICS: 'false'
+
+jobs:
+  changes:
+    runs-on: ubuntu-24.04
+    outputs:
+      projects: ${{ steps.changed.outputs.projects }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup
+      - id: changed
+        env:
+          BEFORE: ${{ github.event.before }}
+          INPUT: ${{ inputs.project }}
+        run: |
+          if [ "${{ github.event_name }}" = workflow_dispatch ]; then
+            all=$(pnpm -s changed --all)
+            if [ -n "$INPUT" ]; then projects=$(echo "$all" | jq -c --arg p "$INPUT" 'map(select(. == $p))'); else projects=$all; fi
+          elif [ -z "$BEFORE" ] || [ "$BEFORE" = 0000000000000000000000000000000000000000 ]; then
+            projects=$(pnpm -s changed --all)
+          else
+            projects=$(pnpm -s changed "$BEFORE")
+          fi
+          echo "projects=$projects" | tee -a "$GITHUB_OUTPUT"
+
+  deploy:
+    needs: changes
+    if: needs.changes.outputs.projects != '[]'
+    runs-on: ubuntu-24.04
+    environment:
+      name: production
+      url: ${{ steps.out.outputs.url }}
+    permissions:
+      contents: read
+      id-token: write
+    strategy:
+      fail-fast: false
+      max-parallel: 1 # providers before consumers (changed-projects sorts them)
+      matrix:
+        project: ${{ fromJson(needs.changes.outputs.projects) }}
+    concurrency:
+      group: deploy-${{ matrix.project }}
+      cancel-in-progress: false
+    env:
+      P: ${{ matrix.project }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup
+      - uses: opentofu/setup-opentofu@a1320f892987e89d278cc92dc5adc984fb93aca4 # v2.0.2
+        with:
+          tofu_version_file: .opentofu-version
+          tofu_wrapper: false
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ env.DEPLOY_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Build
+        run: pnpm --filter "$P-api" --filter "$P-web" build
+
+      - name: tofu apply (Lambda code ships here)
+        working-directory: apps/${{ matrix.project }}/infra
+        run: |
+          tofu init -input=false -backend-config=../../../infra/backend.hcl
+          tofu apply -input=false -auto-approve -lock-timeout=5m
+
+      - id: out
+        working-directory: apps/${{ matrix.project }}/infra
+        run: |
+          secret=$(tofu output -raw origin_secret)
+          echo "::add-mask::$secret"
+          printf 'ORIGIN_SECRET=%s\n' "$secret" > "$RUNNER_TEMP/worker-secrets.env"
+          echo "api_url=$(tofu output -raw api_url)" >> "$GITHUB_OUTPUT"
+          echo "url=https://$(tofu output -raw subdomain).dr4w.io" >> "$GITHUB_OUTPUT"
+
+      - name: wrangler deploy (SPA + proxy Worker, secret in the same version)
+        working-directory: apps/${{ matrix.project }}/web
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          API_URL: ${{ steps.out.outputs.api_url }}
+        run: |
+          pnpm exec wrangler deploy --var "API_ORIGIN:$API_URL" --secrets-file "$RUNNER_TEMP/worker-secrets.env"
+          rm -f "$RUNNER_TEMP/worker-secrets.env"
+
+      - name: Wait for the custom domain (first deploy issues a certificate)
+        env:
+          URL: ${{ steps.out.outputs.url }}
+        run: |
+          for i in $(seq 1 60); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "$URL/api/health" || true)
+            [ "$code" = 200 ] && exit 0
+            echo "attempt $i: $code"; sleep 5
+          done
+          exit 1
+
+      - name: Smoke test
+        working-directory: apps/${{ matrix.project }}/web
+        env:
+          BASE_URL: ${{ steps.out.outputs.url }}
+          API_URL: ${{ steps.out.outputs.api_url }}
+        run: |
+          pnpm exec playwright install --with-deps chromium
+          pnpm smoke

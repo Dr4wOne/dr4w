@@ -1,4 +1,4 @@
-// pnpm changed [base-ref]  →  JSON array of project names to plan/deploy, providers first.
+// pnpm changed [base-ref | --all]  →  JSON array of project names to plan/deploy, providers first.
 // A change under a shared path (packages/, infra/modules/, lockfile, …) affects every project.
 import { execFileSync } from 'node:child_process'
 import { listProjects, sortByDependencies } from './lib/projects.ts'
@@ -19,10 +19,17 @@ export function changedProjects(files: string[], projects: string[]): string[] {
 }
 
 if (import.meta.main) {
-  const base = process.argv[2] ?? process.env.BASE_SHA ?? 'origin/main'
-  const files = execFileSync('git', ['diff', '--name-only', `${base}...HEAD`], { encoding: 'utf8' })
-    .split('\n')
-    .filter(Boolean)
   const names = sortByDependencies(listProjects()).map((p) => p.name)
-  console.info(JSON.stringify(changedProjects(files, names)))
+  const arg = process.argv[2]
+  if (arg === '--all') {
+    console.info(JSON.stringify(names))
+  } else {
+    const base = arg ?? process.env.BASE_SHA ?? 'origin/main'
+    const files = execFileSync('git', ['diff', '--name-only', `${base}...HEAD`], {
+      encoding: 'utf8',
+    })
+      .split('\n')
+      .filter(Boolean)
+    console.info(JSON.stringify(changedProjects(files, names)))
+  }
 }

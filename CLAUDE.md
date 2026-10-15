@@ -20,4 +20,7 @@ Read first: `docs/tasks.md` (where we are), `docs/architecture.md` (how/why), `d
 - Events: `source = dr4w.<project>`, `detail-type = <Entity>.<Event>.v<N>`; defined with `defineEvent` in `packages/contracts/src/events/`.
 
 ## Commands
-`pnpm dev [project…]` · `pnpm new <name>` · `pnpm seed <project>` · `pnpm changed [base]` · `pnpm check`
+`pnpm dev [project…]` · `pnpm new <name>` · `pnpm seed <project>` · `pnpm changed [base|--all]` · `pnpm check` · `pnpm infra:check`
+
+AWS locally: `AWS_PROFILE=dr4w` (SSO, `aws sso login --profile dr4w`). Never use the default profile.
+Deploy = merge to `main` (`.github/workflows/deploy.yml`): tofu apply → `wrangler deploy --var API_ORIGIN:… --secrets-file …` → Playwright smoke.
