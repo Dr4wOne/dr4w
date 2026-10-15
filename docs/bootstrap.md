@@ -36,7 +36,10 @@ unzip -qo /tmp/awscliv2.zip -d /tmp && /tmp/aws/install -i ~/.local/aws-cli -b ~
 
 ## 1. AWS account
 
-Use one AWS account dedicated to dr4w (the platform assumes it owns every `dr4w-*` name in it).
+dr4w lives in the **existing account `809411919562`** (shared with other work; decided 2026-10-14).
+The platform only creates and touches `dr4w-*` names. Identity Center already exists there
+(`https://d-9066602024.awsapps.com/start`), so 1.2 is mostly about adding an admin permission set.
+Note: the $10 budget measures the **whole account**, not only dr4w.
 
 1. **Root user:** sign in as root → *Security credentials* → assign an **MFA device**. Delete any
    root access keys. Store the root password + MFA recovery somewhere offline; don't use root again.
@@ -136,18 +139,19 @@ gh secret set CLOUDFLARE_ACCOUNT_ID --env production --repo Dr4wOne/dr4w
 
 ## 5. Run `infra/bootstrap`
 
-Creates: state bucket `dr4w-tfstate-<account_id>`, GitHub OIDC provider, `dr4w-boundary`,
+Creates: state bucket `dr4w-tfstate-<account_id>`, `dr4w-boundary`,
 `dr4w-ci-plan`, `dr4w-ci-deploy` (+ its two policies). Review the plan before typing `yes`.
 
-> If the account already has a GitHub OIDC provider (`token.actions.githubusercontent.com`),
-> import it first: `tofu import aws_iam_openid_connect_provider.github <its ARN>`.
+> The account's GitHub OIDC provider already exists and is shared with non-dr4w roles, so
+> bootstrap only *references* it (data source). Trust policies use the repo's **immutable**
+> subject (`repo:Dr4wOne@279559492/dr4w@1420042428:…`) — see `variables.tf`.
 
 ```bash
 aws sso login --profile dr4w
 export AWS_PROFILE=dr4w
 cd ~/dr4w/infra/bootstrap
 tofu init
-tofu plan      # expect ~17 resources to add, 0 to change/destroy
+tofu plan      # expect 16 resources to add, 0 to change/destroy
 tofu apply
 
 # Shared backend settings for every stack, then move this stack's state into the bucket:

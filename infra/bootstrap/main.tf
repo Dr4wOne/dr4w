@@ -4,7 +4,7 @@ data "aws_partition" "current" {}
 locals {
   account_id = data.aws_caller_identity.current.account_id
   partition  = data.aws_partition.current.partition
-  repo       = "repo:${var.github_owner}/${var.github_repo}"
+  repo       = "repo:${var.github_owner}@${var.github_owner_id}/${var.github_repo}@${var.github_repo_id}"
 }
 
 # ── State bucket ─────────────────────────────────────────────────────────────
@@ -90,8 +90,8 @@ resource "aws_s3_bucket_policy" "state" {
 }
 
 # ── GitHub Actions OIDC ──────────────────────────────────────────────────────
-# AWS validates GitHub's certificate itself, so no thumbprint is needed.
-resource "aws_iam_openid_connect_provider" "github" {
-  url            = "https://token.actions.githubusercontent.com"
-  client_id_list = ["sts.amazonaws.com"]
+# The account's provider is shared with non-dr4w roles, so we only reference it (never manage it):
+# destroying this stack must not break other pipelines.
+data "aws_iam_openid_connect_provider" "github" {
+  url = "https://token.actions.githubusercontent.com"
 }
