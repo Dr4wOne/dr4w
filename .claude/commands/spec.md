@@ -6,7 +6,7 @@ argument-hint: <slug>
 Write the spec for `ideas/$ARGUMENTS/` from its `00-idea.md`.
 
 Read first: `CLAUDE.md`, `infra/modules/README.md` (the **only** infra you may use),
-`docs/connecting-projects.md` if it touches another project, and the target project's
+`docs/guides/connect-projects.md` if it touches another project, and the target project's
 `project.json` + `api/src/app.ts` if it's a feature for an existing project.
 
 Create `ideas/$ARGUMENTS/01-spec.md` with:

@@ -1,16 +1,21 @@
 # __NAME__
 
-Live at `https://__SUBDOMAIN__.dr4w.io` (once `status` in `project.json` is `live`).
+<What this project does, for a user, in one or two sentences.>
 
-| Part | Path | Notes |
-|---|---|---|
-| API | `api/` | Hono app. Routes in `api/src/routes/`, mounted in `api/src/app.ts` |
-| Web | `web/` | Vite + React SPA; `web/worker/index.ts` serves it and proxies `/api/*` |
-| Infra | `infra/` | Table schema in `infra/tables.json` |
+**Live:** https://__SUBDOMAIN__.dr4w.io · **Status:** see `project.json` · **Agent notes:** `CLAUDE.md`
 
+## Run locally
 ```bash
-pnpm --filter __NAME__ dev        # web http://localhost:__WEB_PORT__ · api http://localhost:__API_PORT__
+pnpm dev __NAME__                     # web http://localhost:__WEB_PORT__ · api http://localhost:__API_PORT__
 pnpm --filter "./apps/__NAME__/**" test
 ```
 
-Add an endpoint: `/endpoint __NAME__ GET /things`. Add infra: `/resource __NAME__ table|queue|bucket|cron|event`.
+## Parts
+| Part | Path |
+|---|---|
+| API (Hono) | `api/src/` — routes in `api/src/routes/`, mounted in `api/src/app.ts` |
+| Web (React + proxy Worker) | `web/src/`, `web/worker/index.ts` |
+| Infra (OpenTofu) | `infra/main.tf`, tables in `infra/tables.json` |
+| Smoke test | `web/e2e/smoke.spec.ts` |
+
+Add an endpoint: `/endpoint __NAME__ GET /api/things`. Add infra: `/resource __NAME__ table|queue|bucket|cron|event`.

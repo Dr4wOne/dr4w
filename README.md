@@ -1,70 +1,68 @@
 # dr4w
 
-Personal idea-to-launch platform: one monorepo, many small projects, ~$0 idle cost.
-Each project is a React SPA on a Cloudflare Worker that proxies `/api/*` to one Hono Lambda on AWS.
+A personal platform that takes an idea to a live product at `<name>.dr4w.io` with almost no idle cost.
+Each project is a React app on a Cloudflare Worker that proxies `/api/*` to one Hono Lambda on AWS.
+One monorepo, shared infrastructure modules, and Claude slash commands for the idea → launch pipeline.
 
-> Live: https://hello.dr4w.io (notes) and https://echo.dr4w.io (counts hello's notes via `dr4w-bus`).
+## Prerequisites
+Node 24, pnpm 12, Docker, Git, GitHub CLI. For cloud work also OpenTofu 1.13 and AWS CLI ≥ 2.9.
+Exact versions: `docs/stack.md`. Install steps: `docs/setup-new-machine.md`.
 
-## Requirements
-
-Node 24 (`.nvmrc`), pnpm 12, Docker. Linux/macOS (Windows: WSL2).
-
-## From idea to live (Claude slash commands)
-
-```
-/idea a tiny guestbook for my site     → ideas/<slug>/00-idea.md
-/refine <slug>                          → ≤7 questions, keep or drop        (optional)
-/spec <slug>                            → 01-spec.md (stories, endpoints, data, infra)
-/plan <slug>                            → 02-tasks.md (≤1h tasks, each with a test)
-/poc <slug>                             → pnpm new + implementation, pnpm dev works
-/launch <slug>                          → checklist + PR; merge = deploy to <sub>.dr4w.io
-/endpoint <project> POST /api/things    → route + zod schema + test
-/resource <project> table|queue|bucket|cron|event
-```
-`pnpm ideas` shows the board. Details: `ideas/README.md`.
-
-## 5-minute tour
-
+## Quick start (local, no cloud access needed)
 ```bash
+gh repo clone Dr4wOne/dr4w && cd dr4w
 pnpm install
-pnpm dev hello            # or just `pnpm dev` to pick; runs fully offline
-#  web  http://localhost:5173   (Vite + the real Worker in workerd)
-#  api  http://localhost:8787   (same Hono app as Lambda, on Node)
-
-pnpm new myproject        # scaffold apps/myproject from templates/project
-pnpm check                # lint + typecheck + test + build (everything)
-pnpm infra:check          # tofu fmt + validate for every stack (offline)
-pnpm dev:cloud hello      # local API against hello's REAL AWS resources (SSO profile dr4w)
+pnpm run doctor           # checks tools and access
+pnpm dev hello            # http://localhost:5173
 ```
 
-Deploy = merge a PR to `main`. CI plans changed projects on the PR; `deploy.yml` applies,
-ships the Worker and runs the Playwright smoke test. Operations: `docs/runbook.md`.
-
-`pnpm dev` starts `dynamodb-local` (Docker, host port 8100) and creates the project's tables
-from `apps/<p>/infra/tables.json`. Data is in-memory: restarting the container clears it.
-
-## Layout
-
-| Path | What |
+## Daily commands
+| Command | What it does |
 |---|---|
-| `apps/<p>/` | One project: `project.json`, `api/` (Hono), `web/` (Vite SPA + Worker), `infra/` |
-| `packages/contracts` | zod schemas + cross-project event definitions |
-| `packages/api-kit` | Hono middlewares (origin secret, errors, logging, validation), DynamoDB, `publish()` |
-| `packages/web-kit` | Typed API client (`createApi`, `unwrap`) + tiny UI basics |
-| `templates/project` | What `pnpm new` copies |
-| `scripts/` | `new`, `dev`, `seed`, `changed`, Lambda build |
-| `infra/` | OpenTofu: `bootstrap` (once, local), `platform` (shared), `modules/` (per-project building blocks) |
-| `.github/workflows` | `ci` (PR checks + plan comment), `deploy` (push to main), `platform` + `destroy` (manual) |
-| `ideas/` | Idea → spec → plan docs, one folder per idea |
-| `.claude/commands` | The idea-pipeline slash commands |
-| `docs/` | `SPEC.md`, `architecture.md`, `tasks.md`, `bootstrap.md`, `runbook.md`, `connecting-projects.md` |
+| `pnpm dev [project…]` | Run projects offline (dynamodb-local + API + Worker/Vite); no args = pick |
+| `pnpm dev:cloud <project>` | Same, but the API uses the project's **real** AWS resources (SSO profile `dr4w`) |
+| `pnpm new <name>` | Scaffold `apps/<name>/` from `templates/project/` |
+| `pnpm check` | Lint + project contract + typecheck + test + build |
+| `pnpm infra:check` | `tofu fmt` + `validate` for every stack (offline) |
+| `pnpm check:projects` | Validate `project.json` files and `uses`/`exposes` links |
+| `pnpm docs:check` | Broken links, missing project docs, stale `docs/STATUS.md` |
+| `pnpm run doctor` | Tool versions, Docker, AWS SSO, GitHub login |
+| `pnpm ideas` | The idea board |
+| `pnpm seed <project>` | Create a project's tables in dynamodb-local |
+| `pnpm format` | Fix formatting (Biome) |
 
-## Common tasks
+Deploy = merge a PR to `main` (`docs/guides/deploy.md`).
 
-| I want to… | Do |
+## Idea pipeline (Claude slash commands)
+| Command | Result |
 |---|---|
-| Add an endpoint | New file in `apps/<p>/api/src/routes/`, one `.route()` line in `app.ts`, a test next to it |
-| Share a schema between web and api | Add it to `packages/contracts/src/<p>.ts` |
-| Connect two projects | `docs/connecting-projects.md` (events via `dr4w-bus`, or `project-ref`) |
-| Add infra (table, queue, bucket, cron…) | Pick from `infra/modules/README.md`, add a block to `apps/<p>/infra/main.tf` |
-| Change a table key schema | Edit `apps/<p>/infra/tables.json` (local seed and OpenTofu both read it) |
+| `/idea <one-liner>` | `ideas/<slug>/00-idea.md` |
+| `/refine <slug>` | ≤ 7 questions, then keep or drop |
+| `/spec <slug>` | `01-spec.md`: stories, endpoints, data, infra from the module catalog |
+| `/plan <slug>` | `02-tasks.md`: tasks ≤ 1 h, each with its test |
+| `/poc <slug>` | Scaffold + implementation; `pnpm dev` works |
+| `/launch <slug>` | Checklist + PR; merging deploys |
+| `/endpoint <project> <METHOD /path>` | Route + schema + test |
+| `/resource <project> <table\|queue\|bucket\|cron\|event>` | Module block + wiring |
+| `/start` · `/handoff` · `/where <topic>` · `/doc-check` | Session protocol (`CLAUDE.md`) |
+
+## Where is…?
+| Looking for | Go to |
+|---|---|
+| Current state, known issues | `docs/STATUS.md` |
+| Every doc, by task | `docs/README.md` |
+| How it works | `docs/architecture.md` |
+| Why it's built this way | `docs/decisions/` |
+| A file or folder | `docs/repo-map.md` |
+| Rules and patterns | `docs/conventions.md`, `docs/dos-and-donts.md` |
+| Costs, security | `docs/costs.md`, `docs/security.md` |
+| Something broke | `docs/troubleshooting.md`, `docs/guides/debugging-prod.md` |
+| Infra building blocks | `infra/modules/README.md` |
+
+## Live projects
+| Project | URL | Status |
+|---|---|---|
+| hello | https://hello.dr4w.io | live — notes, publishes `Note.Created.v1` |
+| echo | https://echo.dr4w.io | live — counts hello's notes via `dr4w-bus` |
+
+Status of everything else: `docs/STATUS.md`.

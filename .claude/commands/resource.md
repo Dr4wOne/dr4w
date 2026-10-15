@@ -19,7 +19,7 @@ into `module "api"` (concat with the existing list) and new resource names as en
 - **cron**: `module "<name>_cron" { source = "../../../infra/modules/cron" … function_arn = module.api.function_arn }`;
   handle the `dr4w.cron` / `Cron.<name>.v1` envelope in `api/src/events.ts` (add a
   `defineEvent` for it in contracts). Locally: POST the envelope to `/api/_events`.
-- **event**: consuming another project's event → follow `docs/connecting-projects.md`
+- **event**: consuming another project's event → follow `docs/guides/connect-projects.md`
   (exposes/uses, `onEvent`, `event-subscription`). Publishing → `defineEvent` + `publish()` +
   `publishes_events = true`.
 

@@ -1,32 +1,50 @@
-# dr4w — notes for Claude
+# dr4w — agent guide
 
-Read first: `docs/tasks.md` (where we are), `docs/architecture.md` (how/why), `docs/SPEC.md` (requirements + amendments).
-Ops: `docs/runbook.md`. Connecting projects: `docs/connecting-projects.md`. Infra catalog: `infra/modules/README.md`.
-Idea pipeline: `.claude/commands/*.md` (`/idea` → `/refine` → `/spec` → `/plan` → `/poc` → `/launch`, plus `/endpoint`, `/resource`).
+## Stack
+- pnpm 12 + Turborepo monorepo, TypeScript ESM everywhere, Biome. Versions: `docs/stack.md`.
+- `apps/<p>/web`: Vite + React SPA on a Cloudflare Worker that proxies `/api/*` (origin secret).
+- `apps/<p>/api`: one Hono Lambda per project (Node 24, arm64) behind an API Gateway HTTP API.
+- Data: DynamoDB on-demand (`apps/<p>/infra/tables.json`); events on EventBridge `dr4w-bus`.
+- Infra: OpenTofu, modules in `infra/modules/`, deployed by GitHub Actions via OIDC.
 
-## Rules
-- Spec-driven: stop at every ⏸ in `docs/tasks.md` for approval.
-- **Never** run `tofu apply`, `wrangler deploy`, or anything that changes AWS/Cloudflare/GitHub without an explicit "go".
-- The repo is **public**: never commit secrets, tokens or `.env.local`/`.dev.vars`.
-- Pin versions in the `catalog:` of `pnpm-workspace.yaml`; check current docs before adding a dependency.
-- pnpm enforces a minimum release age; don't add `minimumReleaseAgeExclude` — pick an older version.
-- Never touch the `dr4w.io` apex or `www` (owned by `Dr4wOne/dr4w-landpage`).
-- `main` is protected: change it via PR (`check` + `plan` must pass). Push with
-  `git -c credential.helper= -c 'credential.helper=!gh auth git-credential' push`.
-- The `rtk` hook truncates output: use `rtk proxy <cmd>` for `tofu plan` and anything you must read in full.
-
-## Conventions
-- TypeScript ESM everywhere; imports use `.ts` extensions; internal packages export source (no build step).
-- Lint/format: Biome (`pnpm lint`, `pnpm format`). Single quotes, no semicolons.
-- API: Hono with `basePath('/api')`; one file per resource in `src/routes/`, mounted in `src/app.ts` with `.route()` (keeps RPC types). Validate with `validate()` + zod schemas from `@dr4w/contracts`.
-- Data access in `src/data/`; env vars only via `src/env.ts` (`parseEnv`).
-- Tests: Vitest; API tests hit dynamodb-local via `test/helpers.ts` `call()` (adds the origin secret). Web component tests use `// @vitest-environment jsdom`.
-- AWS names: `dr4w-<project>-<env>-<thing>`; SSM: `/dr4w/<project>/<env>/<key>`.
-- Events: `source = dr4w.<project>`, `detail-type = <Entity>.<Event>.v<N>`; defined with `defineEvent` in `packages/contracts/src/events/`; consumed via `onEvent()` in `src/events.ts` (idempotent!). See `docs/connecting-projects.md`.
-- Cross-project: `uses`/`exposes` in project.json; `pnpm check:projects` validates.
+## Never
+- Run `tofu apply`/`destroy`, `wrangler deploy`, merge to `main`, or change AWS/Cloudflare/GitHub settings without an explicit "go".
+- Commit secrets, `.env.local`, `.dev.vars`, state or plan files. The repo is **public**.
+- Use the default AWS profile (root keys). Always `AWS_PROFILE=dr4w`.
+- Add raw `resource` blocks to a project stack, wildcard IAM actions, NAT/VPC Lambdas/provisioned capacity/dashboards.
+- Touch the `dr4w.io` apex or `www` (owned by `Dr4wOne/dr4w-landpage`).
+- Add `minimumReleaseAgeExclude`: pin an older version in the `catalog:` instead.
 
 ## Commands
-`pnpm dev [project…]` · `pnpm new <name>` · `pnpm seed <project>` · `pnpm changed [base|--all]` · `pnpm check` · `pnpm check:projects` · `pnpm infra:check` · `pnpm ideas` · `pnpm dev:cloud <p>`
+`pnpm check` · `pnpm infra:check` · `pnpm docs:check` · `pnpm run doctor` · `pnpm dev <p>` · `pnpm new <name>`.
+Ship: branch → PR (`check` + `plan` must pass) → squash-merge = deploy (`docs/guides/deploy.md`).
+Push: `git -c credential.helper= -c 'credential.helper=!gh auth git-credential' push -u origin <branch>`.
+The `rtk` hook truncates output: use `rtk proxy <cmd>` for `tofu plan` and anything you must read in full.
 
-AWS locally: `AWS_PROFILE=dr4w` (SSO, `aws sso login --profile dr4w`). Never use the default profile.
-Deploy = merge to `main` (`.github/workflows/deploy.yml`): tofu apply → `wrangler deploy --var API_ORIGIN:… --secrets-file …` → Playwright smoke.
+## Read X when Y
+| When | Read |
+|---|---|
+| Starting a session | `docs/STATUS.md` (or run `/start`) |
+| Looking for a file | `docs/repo-map.md` |
+| Writing API/web code | `docs/conventions.md`, `docs/dos-and-donts.md` |
+| Adding an endpoint / resource | `docs/guides/new-endpoint.md`, `docs/guides/new-resource.md`, `infra/modules/README.md` |
+| Linking projects or events | `docs/guides/connect-projects.md` |
+| Working inside a project | `apps/<p>/CLAUDE.md` (loaded automatically there) |
+| Deploying, rolling back, destroying | `docs/guides/deploy.md`, `rollback.md`, `destroy-project.md` |
+| Secrets, IAM, auth | `docs/security.md`, `docs/guides/secrets.md` |
+| Something failed | `docs/troubleshooting.md`, `docs/guides/debugging-prod.md` |
+| Costs | `docs/costs.md` |
+| "Why is it like this?" | `docs/decisions/README.md` |
+| Changing versions | `docs/stack.md` (update it too) |
+| Idea pipeline | `ideas/README.md`, `.claude/commands/*.md` |
+
+## Session protocol
+- `/start` — first thing: briefing from `docs/STATUS.md`, recent commits and `git status`.
+- `/where <topic>` — file paths for "where is X?".
+- `/doc-check` — before merging: fix docs the diff made stale.
+- `/handoff` — at the end, or before the context fills: update `docs/STATUS.md`, add an ADR for any
+  decision, update stale docs, commit `docs: session handoff`.
+
+**The repo is the memory.** Anything worth remembering goes into `docs/STATUS.md`, an ADR in
+`docs/decisions/`, or the right doc — not only into chat or tool-specific memory — so it travels
+with `git clone`. Docs are plain, complete English (rules: `docs/conventions.md` → Docs).

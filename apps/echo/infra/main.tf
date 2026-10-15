@@ -28,7 +28,7 @@ module "api" {
   iam_statements = flatten([for t in module.tables : t.iam_statements])
 }
 
-# ── Cross-project wiring (docs/connecting-projects.md) ───────────────────────
+# ── Cross-project wiring (docs/guides/connect-projects.md) ───────────────────────
 # Async: hello's Note.Created.v1 events → this project's Lambda (src/events.ts).
 module "from_hello" {
   source           = "../../../infra/modules/event-subscription"
