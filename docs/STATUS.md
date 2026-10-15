@@ -37,16 +37,16 @@ acceptance criteria: `docs/SPEC.md` §9. Dry run: `ideas/guestbook/` (idea → l
 | PR previews not built | By decision | ADR 0014 |
 | Spec said private repo, dedicated Vite proxy, inline Lambda zips | Built differently | ADRs 0002, 0005, 0010 |
 
-## Recent decisions (newest first)
-1. [0014 No PR previews](decisions/0014-no-pr-previews.md)
-2. [0013 Destroy via Cloudflare API](decisions/0013-destroy-via-cloudflare-api.md)
-3. [0011 One Lambda handles bus events](decisions/0011-single-lambda-handles-events.md)
-4. [0010 Lambda code via S3](decisions/0010-lambda-code-via-s3.md)
-5. [0007 Origin secret in SSM, refreshed on mismatch](decisions/0007-origin-secret-in-ssm.md)
-6. [0012 Immutable OIDC subject, shared provider](decisions/0012-oidc-immutable-subject-shared-provider.md)
-7. [0003 Single shared AWS account](decisions/0003-single-shared-aws-account.md)
-8. [0002 Public repo, `production` environment](decisions/0002-public-repo-production-environment.md)
-9. [0009 Reserved concurrency off by default](decisions/0009-reserved-concurrency-off-by-default.md)
-10. [0008 `exposes` grants](decisions/0008-exposes-grants.md)
+## Recent decisions (highest number first)
+1. [0016 Platform uses subdomains only](decisions/0016-subdomains-only.md)
+2. [0015 Optional Postgres via the RDS Data API](decisions/0015-postgres-via-data-api.md)
+3. [0014 No PR previews](decisions/0014-no-pr-previews.md)
+4. [0013 Destroy via Cloudflare API](decisions/0013-destroy-via-cloudflare-api.md)
+5. [0012 Immutable OIDC subject, shared provider](decisions/0012-oidc-immutable-subject-shared-provider.md)
+6. [0011 One Lambda handles bus events](decisions/0011-single-lambda-handles-events.md)
+7. [0010 Lambda code via S3](decisions/0010-lambda-code-via-s3.md)
+8. [0009 Reserved concurrency off by default](decisions/0009-reserved-concurrency-off-by-default.md)
+9. [0008 `exposes` grants](decisions/0008-exposes-grants.md)
+10. [0007 Origin secret in SSM, refreshed on mismatch](decisions/0007-origin-secret-in-ssm.md)
 
 All decisions: `docs/decisions/README.md`.

@@ -30,13 +30,13 @@ The `rtk` hook truncates output: use `rtk proxy <cmd>` for `tofu plan` and anyth
 | Adding an endpoint / resource | `docs/guides/new-endpoint.md`, `docs/guides/new-resource.md`, `infra/modules/README.md` |
 | Linking projects or events | `docs/guides/connect-projects.md` |
 | Working inside a project | `apps/<p>/CLAUDE.md` (loaded automatically there) |
-| Deploying, rolling back, destroying | `docs/guides/deploy.md`, `rollback.md`, `destroy-project.md` |
+| Deploying, rolling back, destroying | `docs/guides/deploy.md`, `docs/guides/rollback.md`, `docs/guides/destroy-project.md` |
 | Secrets, IAM, auth | `docs/security.md`, `docs/guides/secrets.md` |
 | Something failed | `docs/troubleshooting.md`, `docs/guides/debugging-prod.md` |
 | Costs | `docs/costs.md` |
 | "Why is it like this?" | `docs/decisions/README.md` |
 | Changing versions | `docs/stack.md` (update it too) |
-| Idea pipeline | `ideas/README.md`, `.claude/commands/*.md` |
+| Idea pipeline, `/endpoint`, `/resource` | `ideas/README.md`, `.claude/commands/*.md` (one file per command) |
 
 ## Session protocol
 - `/start` — first thing: briefing from `docs/STATUS.md`, recent commits and `git status`.

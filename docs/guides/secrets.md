@@ -1,5 +1,7 @@
 # Secrets: where they live and how to rotate them
 
+> ⚠️ Rotation changes production (`tofu apply`, a deploy). Claude needs an explicit "go" first (`CLAUDE.md` → Never).
+
 The full inventory of credentials and secrets is in `docs/security.md`. This guide is the "how".
 
 ## Add a secret for a project's API
@@ -32,8 +34,8 @@ by themselves: on a mismatch they re-read SSM, at most once a minute.
 1. Cloudflare → *My Profile* → *API Tokens* → **Roll** the `dr4w-ci` token (same permissions as
    `docs/bootstrap.md` §3), or create a new one and delete the old one.
 2. `gh secret set CLOUDFLARE_API_TOKEN --env production --repo Dr4wOne/dr4w` (paste the token).
-3. Update local copies, if any (e.g. `~/workspace/*/.env`).
-4. Verify: `gh workflow run deploy.yml -f project=hello` succeeds.
+3. Update any other copy you keep of the token (for example a `CLOUDFLARE_API_TOKEN` line in a local `.env` outside this repo).
+4. Verify: `gh workflow run deploy.yml -f project=hello` succeeds (this redeploys `hello` to production).
 
 ## Common mistakes
 - Rotating the origin secret in SSM without running the deploy — the Worker keeps sending the old one.
