@@ -134,15 +134,39 @@ export function checks(): Check[] {
     plugins = []
   }
   for (const [id, cmds] of [
-    ['caveman@caveman', '/plugin marketplace add JuliusBrussee/caveman  then  /plugin install caveman@caveman'],
-    ['ponytail@ponytail', '/plugin marketplace add DietrichGebert/ponytail  then  /plugin install ponytail@ponytail'],
+    [
+      'caveman@caveman',
+      '/plugin marketplace add JuliusBrussee/caveman  then  /plugin install caveman@caveman',
+    ],
+    [
+      'ponytail@ponytail',
+      '/plugin marketplace add DietrichGebert/ponytail  then  /plugin install ponytail@ponytail',
+    ],
   ] as const) {
     const p = plugins.find((x) => (x.id ?? x.name) === id || x.name === id.split('@')[0])
     const ok = !!p && p.enabled !== false
-    add(`plugin ${id.split('@')[0]}`, ok, listed === null ? 'claude CLI not found' : p ? (ok ? 'installed, enabled' : 'installed, disabled') : 'not installed', `in Claude Code: ${cmds}`, 'warn')
+    add(
+      `plugin ${id.split('@')[0]}`,
+      ok,
+      listed === null
+        ? 'claude CLI not found'
+        : p
+          ? ok
+            ? 'installed, enabled'
+            : 'installed, disabled'
+          : 'not installed',
+      `in Claude Code: ${cmds}`,
+      'warn',
+    )
   }
   const cavemanCli = run('sh', ['-c', 'command -v caveman'])
-  add('caveman CLI absent', !cavemanCli, cavemanCli ? `found at ${cavemanCli} (sends telemetry by default)` : 'not installed (good)', 'see docs/agent-tools.md → Optional: the caveman CLI', 'warn')
+  add(
+    'caveman CLI absent',
+    !cavemanCli,
+    cavemanCli ? `found at ${cavemanCli} (sends telemetry by default)` : 'not installed (good)',
+    'see docs/agent-tools.md → Optional: the caveman CLI',
+    'warn',
+  )
 
   // Advisory
   const creds = join(homedir(), '.aws', 'credentials')
