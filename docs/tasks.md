@@ -45,7 +45,7 @@ Each task is small, ends in a verifiable check, and is ticked when done.
 - [x] 3.4 `.github/workflows/ci.yml` (SHA-pinned actions, plan comment). ✓ opens on a test PR.
 - [x] 3.5 `.github/workflows/deploy.yml` + `platform.yml` + `.github/dependabot.yml`.
 - [x] 3.6 Playwright smoke (`/api/health` 200, home page renders, create+list note). Lives in `apps/<p>/web/e2e`, run against `BASE_URL`.
-- [ ] 3.7 ⏸ On your **"go"**: merge to `main` → deploy. ✓ `https://hello.dr4w.io` live, smoke green, `curl <execute-api>/api/notes` → 403, `/api/health` → 200.
+- [x] 3.7 ⏸ On your **"go"**: merge to `main` → deploy. ✓ `https://hello.dr4w.io` live, smoke green, `curl <execute-api>/api/notes` → 403, `/api/health` → 200.
 
 ## M4 — Second project + connection (`echo`)
 
