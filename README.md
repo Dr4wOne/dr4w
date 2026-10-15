@@ -3,7 +3,7 @@
 Personal idea-to-launch platform: one monorepo, many small projects, ~$0 idle cost.
 Each project is a React SPA on a Cloudflare Worker that proxies `/api/*` to one Hono Lambda on AWS.
 
-> Status: M1–M3 done — `hello` is live at https://hello.dr4w.io. Next: M4 (second project + events). See `docs/tasks.md`.
+> Status: M1–M4 done — live: https://hello.dr4w.io and https://echo.dr4w.io (counts hello's notes via `dr4w-bus`). Next: M5 (idea pipeline + polish). See `docs/tasks.md`.
 
 ## Requirements
 
@@ -45,5 +45,6 @@ from `apps/<p>/infra/tables.json`. Data is in-memory: restarting the container c
 |---|---|
 | Add an endpoint | New file in `apps/<p>/api/src/routes/`, one `.route()` line in `app.ts`, a test next to it |
 | Share a schema between web and api | Add it to `packages/contracts/src/<p>.ts` |
-| Publish a cross-project event | Define it in `packages/contracts/src/events/`, call `publish(Def, detail)` |
+| Connect two projects | `docs/connecting-projects.md` (events via `dr4w-bus`, or `project-ref`) |
+| Add infra (table, queue, bucket, cron…) | Pick from `infra/modules/README.md`, add a block to `apps/<p>/infra/main.tf` |
 | Change a table key schema | Edit `apps/<p>/infra/tables.json` (local seed and OpenTofu both read it) |
