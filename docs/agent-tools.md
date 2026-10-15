@@ -51,7 +51,7 @@ If you ever install it, run both of these first: `caveman telemetry off` and `ca
 
 ## Updating
 Plugins only change when the pinned tag changes. To update: read the new release notes and the
-changed hook files (`hooks/` in ponytail, `src/hooks/` in caveman), then change `ref` in
+changed hook files (the hooks folder in the ponytail repo, src/hooks in the caveman repo), then change `ref` in
 `.claude/settings.json` in a PR, and update the versions at the top of this file.
 
 ## Troubleshooting
