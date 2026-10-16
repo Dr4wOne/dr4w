@@ -49,7 +49,7 @@ variable "timeout_s" {
 }
 
 variable "reserved_concurrency" {
-  description = "null = unreserved. Set to 10 once the account quota is ≥ 1000 (docs/architecture.md D7)."
+  description = "Max concurrent executions for this project; null = unreserved. Projects set 10 (ADR 0009)."
   type        = number
   default     = null
 }

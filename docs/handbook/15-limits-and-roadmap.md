@@ -17,7 +17,7 @@ need to move furniture, you rent a van for that one job — you don't replace th
 | **Heavy relational data** (joins, reports) | DynamoDB needs access patterns designed up front | Turn on the shared Aurora Postgres (`infra/platform/postgres.tf`) + `pg-database`; accept ~$1–3/month and ~15 s resume after a pause |
 | **Long-running work** (> 10 s per request) | Lambda timeout is 10 s — for HTTP *and* event handlers, which share the one function; API Gateway caps a request at 30 s | A second, worker-style function for that project (a new module — the one deliberate exception to "one Lambda per project"), or an AWS Step Functions workflow (a managed multi-step job runner); respond immediately and poll |
 | **Real-time / WebSockets** | HTTP API + Lambda is request/response | Cloudflare Durable Objects or API Gateway WebSocket APIs (new module needed) |
-| **Very high traffic** | Lambda concurrency is 10 for the whole shared account (all projects and other work); throttle 50 rps / burst 100; Workers Free 100k `/api` requests/day for *all* Workers; one partition for hello's notes | get the quota raised (requested), set reserved concurrency per project, move to Workers Paid, raise the throttle, shard keys or add GSIs |
+| **Very high traffic** | each project's Lambda is capped at 10 concurrent executions (`reserved_concurrency`); throttle 50 rps / burst 100; Workers Free 100k `/api` requests/day for *all* Workers; one partition for hello's notes | raise that project's `reserved_concurrency` (the account allows 1000), move to Workers Paid, raise the throttle, shard keys or add GSIs |
 | **SEO / server rendering** | SPA renders in the browser | An SSR or static-generation framework on Workers for that project |
 | **Multi-region / high availability** | single region `us-east-1` | DynamoDB global tables + a second API region; a big step, not planned |
 | **User accounts / login** | v1 non-goal | Cognito or a Workers-side auth provider, checked in the Worker before proxying |
@@ -26,8 +26,7 @@ need to move furniture, you rent a van for that one job — you don't replace th
 
 ### Roadmap (from `docs/STATUS.md`, 2026-10-15)
 - **Next:** measure the real idle cost (~2026-10-22) and replace the estimate in `docs/costs.md`;
-  set reserved concurrency to 10 per project once AWS approves the account's higher Lambda
-  concurrency quota (requested; currently 10 for the whole account); run the
+  run the
   first real idea through `/idea`.
 - **Security hygiene:** the laptop's root access keys were deleted (2026-10-15); narrowing the
   unrelated `gha-sandbox`/`gha-prod` roles is prepared but deferred.
@@ -67,8 +66,7 @@ Expected: the defaults behind several limits above — `50`, `100`, `10`, and `n
 <details><summary>Answers</summary>
 
 1. Accept the request quickly, do the work in an event/queue handler (or a workflow) with a longer timeout, and let the client poll for the result.
-2. Lambda concurrency — today 10 for the whole account, shared by every project — shows up first, as
-   errors; then API Gateway throttling (50 requests/s per project) and, over a day, the Workers Free plan's 100k requests.
+2. The project's Lambda concurrency cap (10 at once) shows up first, as throttled requests (errors); then API Gateway throttling (50 requests/s per project) and, over a day, the Workers Free plan's 100k requests.
 3. They were a deliberate v1 non-goal to keep the platform small; the Worker is the natural place to add a check later.
 </details>
 

@@ -12,7 +12,7 @@ One file per decision, newest at the bottom. Format: Context · Decision · Cons
 | 0006 | [Mount each route file explicitly in `app.ts`](0006-explicit-route-mounting.md) | 2026-10-14 | Accepted |
 | 0007 | [Origin secret in SSM, cached and refreshed on mismatch](0007-origin-secret-in-ssm.md) | 2026-10-14 | Accepted |
 | 0008 | [Cross-project access is granted by the provider (`exposes`)](0008-exposes-grants.md) | 2026-10-14 | Accepted |
-| 0009 | [Lambda reserved concurrency off by default](0009-reserved-concurrency-off-by-default.md) | 2026-10-14 | Accepted |
+| 0009 | [Lambda reserved concurrency off by default](0009-reserved-concurrency-off-by-default.md) — now 10 per project (2026-10-15) | 2026-10-14 | Accepted |
 | 0010 | [Lambda code ships through an S3 artifacts bucket](0010-lambda-code-via-s3.md) | 2026-10-15 | Accepted |
 | 0011 | [One Lambda per project also handles bus events](0011-single-lambda-handles-events.md) | 2026-10-15 | Accepted |
 | 0012 | [Immutable OIDC subjects; reference the shared OIDC provider](0012-oidc-immutable-subject-shared-provider.md) | 2026-10-14 | Accepted |

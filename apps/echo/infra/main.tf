@@ -22,6 +22,9 @@ module "api" {
   env      = var.env
   dist_dir = "${path.module}/../api/dist"
 
+  # Cost and blast-radius cap: at most 10 concurrent executions for this project (ADR 0009).
+  reserved_concurrency = 10
+
   environment = {
     TABLE_NAME = try(module.tables["main"].name, null)
   }

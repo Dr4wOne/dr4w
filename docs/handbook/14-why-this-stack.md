@@ -98,7 +98,7 @@ requires it. ADRs 0001, 0015.
 
 ### 10. One shared AWS account (ADR 0003)
 Chose the existing account to avoid setup. Downside, and the biggest hidden trade-off: projects
-share its quotas (Lambda concurrency is 10 for the *whole* account today), free tiers, budget and
+share its quotas (one account-wide Lambda concurrency pool of 1000, of which each project reserves 10), free tiers, budget and
 the plan role's read access with unrelated workloads. A dedicated account under AWS Organizations
 is free and would remove most of chapter 9's known gaps. Revisit before any real users arrive.
 
