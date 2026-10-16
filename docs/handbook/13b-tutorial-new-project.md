@@ -105,7 +105,7 @@ import { listDigests } from '../data/days.ts'
 
 export const digests = new Hono().get('/', async (c) => c.json({ items: await listDigests() }, 200))
 ```
-Test it like `apps/echo/api/src/events.test.ts`: call `handler(envelope, {})` from `./lambda.ts` with a
+Test it like `apps/echo/api/src/events.test.ts`: call `handler(envelope, {})` (exported by the project's `src/lambda.ts`) with a
 `Note.Created.v1` envelope (twice — it must count once), then a `Cron.daily-digest.v1` one, then
 `call('/api/digests')`. Run `pnpm --filter digest-api test`.
 
