@@ -37,4 +37,4 @@ Open the run: `gh run view <id> --log-failed`. Known causes and fixes: `docs/tro
 ## Common mistakes
 - Reading truncated tool output: on this laptop the `rtk` hook shortens command output; use
   `rtk proxy <cmd>` when you need all of it.
-- Using the default AWS profile (root keys). Always `AWS_PROFILE=dr4w`.
+- Forgetting the profile: there are no default credentials (by design). Always `AWS_PROFILE=dr4w`.

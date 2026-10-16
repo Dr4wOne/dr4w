@@ -21,6 +21,7 @@ A **provider** is the plug-in that knows how to talk to one cloud (here: AWS).
 ## How it works in dr4w
 
 ### Three layers
+Each layer is a *stack*: one folder of `.tf` files with its own state.
 Notice that each layer has its own state file and is changed by a different actor.
 ```mermaid
 flowchart TB
@@ -35,7 +36,7 @@ flowchart TB
   p -.->|platform/terraform.tfstate| s
   h -.->|projects/hello/prod/…| s
   e -.->|projects/echo/prod/…| s
-  lap["laptop, admin SSO"]:::local -->|applies| b
+  lap["laptop, admin sign-in"]:::local -->|applies| b
   ci["GitHub Actions"]:::github -->|platform.yml| p
   ci -->|deploy.yml| h
   ci -->|deploy.yml| e
@@ -46,11 +47,12 @@ flowchart TB
 | Layer | Folder | Creates | Applied by |
 |---|---|---|---|
 | Bootstrap | `infra/bootstrap/` | the state bucket, the two CI roles, `dr4w-boundary` | you, once, from the laptop |
-| Platform | `infra/platform/` | `dr4w-bus` + archive, `dr4w-alerts`, `dr4w-monthly` budget, optional Aurora | `platform.yml`, manually |
+| Platform | `infra/platform/` | `dr4w-bus` + archive, `dr4w-alerts`, `dr4w-monthly` budget, optional Aurora | `platform.yml`, started by hand (GitHub → Actions → *platform* → *Run workflow*; repo admins only) |
 | Project | `apps/<p>/infra/` | everything one project needs | `deploy.yml`, on merge |
 
-All stacks share one backend file, `infra/backend.hcl` (bucket, region, lockfile), and declare
-only their own state `key`.
+All stacks share one *backend* file — where state is stored — `infra/backend.hcl` (bucket, region,
+locking), and each declares only its own `key`, the file name inside the bucket. The number in the
+bucket name is the AWS account ID (not a secret).
 
 ### Composing a project from modules
 Notice that a project stack is just a few module blocks wired together.
@@ -63,7 +65,7 @@ flowchart LR
   ma --> out
   classDef aws fill:#FF9900,stroke:#8a5300,color:#000
 ```
-That is `apps/echo/infra/main.tf`. `project-api` creates the Lambda, its role, the HTTP API with
+That is `apps/echo/infra/main.tf` (`function_arn` is the Lambda's ARN, its unique AWS ID). `project-api` creates the Lambda, its role, the HTTP API with
 throttling, a 14-day log group, two alarms, the origin secret and an S3 bucket for the code.
 Every module writes its useful outputs to SSM under `/dr4w/<project>/<env>/` and returns
 `iam_statements`, which the project passes to `project-api` so the Lambda gets exactly those
@@ -80,14 +82,20 @@ each `apps/*/infra`. It runs fully offline (`scripts/infra-check.sh`).
 - **Why OpenTofu:** open-source Terraform fork, stable, multi-provider; chosen over SST, CDK and
   Pulumi (chapter 14, `docs/decisions/0001-baseline-stack.md`). OpenTofu-only feature used:
   variables in the backend block (`key = "projects/hello/${var.env}/terraform.tfstate"`).
-- **Locking:** native S3 lockfiles (`use_lockfile = true`), no DynamoDB lock table. CI also uses a
+- **Locking:** native S3 lock files for *state* (`use_lockfile = true`), no DynamoDB lock table. (Not to be
+  confused with `.terraform.lock.hcl`, which pins provider versions, or `pnpm-lock.yaml` for npm packages.) CI also uses a
   per-project concurrency group, so two deploys of one project never overlap.
 - **State contains secrets** (the origin secrets). The bucket is versioned, encrypted, TLS-only,
   public access blocked; the deploy role can't change its settings (`infra/bootstrap/ci-roles.tf`).
 - **Blast radius:** a project's state only contains that project. Bootstrap is deliberately out
   of CI's reach — CI can't widen its own permissions.
 - **Provider pins:** `hashicorp/aws ~> 6.69` with lock files committed for Linux and macOS; versions in `docs/stack.md`.
-- **Drift:** nothing changes resources outside OpenTofu, so a plan with unexpected changes is a red flag to investigate before merging.
+- **Drift:** a few things change outside OpenTofu on purpose — the emergency stop (`aws lambda
+  put-function-concurrency`, which the next deploy silently undoes), Cloudflare dashboard rollbacks,
+  and Worker settings managed by wrangler. Anything else in a plan you didn't expect is a red flag.
+- **Apply is not the reviewed plan:** `deploy.yml` plans again on `main` and applies with
+  `-auto-approve`; another merge in between can change it. The PR comment keeps only the last 20 kB
+  of a plan, so read the `Plan:` summary line, which counts every destroy.
 
 ## Common mistakes
 - Raw `resource` blocks in a project stack instead of a module — `docs/dos-and-donts.md` → Infra.

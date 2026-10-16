@@ -30,6 +30,9 @@ const GENERATED =
  */
 export function resolves(path: string, fromFile: string, tracked: string[] = []): boolean {
   if (GENERATED.test(path)) return true
+  // apps/<name>/… for a project that doesn't exist yet: a doc describing what to create.
+  const project = path.match(/^apps\/([^/]+)\//)?.[1]
+  if (project && !existsSync(join(repoRoot, 'apps', project))) return true
   if (existsSync(join(dirname(fromFile), path)) || existsSync(join(repoRoot, path))) return true
   const tail = path.replace(/^(\.\.\/)+/, '')
   return tracked.some((t) => t.endsWith(`/${tail}`) || t.includes(`/${tail.replace(/\/$/, '')}/`))

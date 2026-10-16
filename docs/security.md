@@ -37,5 +37,5 @@ Secrets, tokens, `.env.local`, `.dev.vars`, `*.tfstate`, plan files. The repo is
 GitHub secret scanning and push protection are on. Account IDs and role ARNs are fine to commit.
 
 ## Open security items
-Tracked in `docs/STATUS.md` → Known issues (root access keys on the laptop, the broad
+Tracked in `docs/STATUS.md` → Known issues (the broad
 `gha-sandbox` trust in the shared account).
