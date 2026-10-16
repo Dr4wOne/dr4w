@@ -58,6 +58,7 @@ Deploy = merge a PR to `main` (`docs/guides/deploy.md`).
 | Costs, security | `docs/costs.md`, `docs/security.md` |
 | Something broke | `docs/troubleshooting.md`, `docs/guides/debugging-prod.md` |
 | Infra building blocks | `infra/modules/README.md` |
+| Agent plugins (caveman, ponytail) | `docs/agent-tools.md` |
 
 ## Live projects
 | Project | URL | Status |

@@ -38,6 +38,20 @@ The `rtk` hook truncates output: use `rtk proxy <cmd>` for `tofu plan` and anyth
 | Changing versions | `docs/stack.md` (update it too) |
 | Idea pipeline, `/endpoint`, `/resource` | `ideas/README.md`, `.claude/commands/*.md` (one file per command) |
 
+## Caveman + ponytail (plugins; enabled in `.claude/settings.json`; details `docs/agent-tools.md`)
+- Caveman voice is for **chat replies only**. Files for humans — README, `docs/**`, `ideas/**`, ADRs,
+  PR descriptions, commit bodies — stay plain, complete English. Commit subjects may be `/caveman-commit` style.
+- Full sentences for security warnings, anything irreversible (`tofu apply`/`destroy`, secret rotation,
+  deletes), deploy confirmations, and whenever I seem confused.
+- Ponytail runs **inside** the spec flow: `/spec` and `/plan` still write full docs; ponytail limits how
+  much code `/poc` and `/endpoint` write.
+- Reuse the platform first: `infra/modules/*`, `packages/*` and the Hono/zod helpers count as "already in this codebase".
+- **Never cut:** input validation at the Worker/API boundary, the origin-secret check, IAM least
+  privilege, tests for logic, accessibility in the web UI.
+- `shortcut:` comments are allowed. `/ponytail-debt` before each `/launch` → open items into
+  `docs/STATUS.md` → Known issues. `/ponytail-review` before merging; `/ponytail-audit` monthly.
+- Off for a session: `/caveman off`, `/ponytail off`.
+
 ## Session protocol
 - `/start` — first thing: briefing from `docs/STATUS.md`, recent commits and `git status`.
 - `/where <topic>` — file paths for "where is X?".

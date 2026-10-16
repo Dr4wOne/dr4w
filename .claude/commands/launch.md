@@ -11,6 +11,8 @@ Checklist — fix anything red before continuing:
       apex or `www`); `status: "live"`; `uses`/`exposes` match any cross-project wiring
 - [ ] Smoke test covers the core flow (`apps/<p>/web/e2e/smoke.spec.ts`)
 - [ ] No secrets in the diff (`git diff main --stat`, scan for tokens/keys); the repo is public
+- [ ] `/ponytail-review` on the branch — fix every must-fix finding
+- [ ] `/ponytail-debt` — copy open `shortcut:` items into `docs/STATUS.md` → Known issues
 - [ ] Idea frontmatter `status: live`, `updated` today
 
 Then:
