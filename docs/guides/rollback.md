@@ -15,7 +15,7 @@ gh pr create --fill                   # CI plans it; merging runs deploy.yml wit
 
 **Fastest — re-run an older successful deploy:** GitHub → Actions → *deploy* → open the last
 good run → *Re-run all jobs*. A re-run uses **that run's commit**, so the Lambda, the infra and
-the Worker all go back together. Afterwards revert on `main` as well, or the next merge brings
+the Worker all go back together — including **deleting** any resources added after that commit. Afterwards revert on `main` as well, or the next merge brings
 the bad code back.
 
 **Frontend only:** Cloudflare dashboard → Workers → `dr4w-<project>` → *Deployments* → roll back

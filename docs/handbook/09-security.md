@@ -1,6 +1,6 @@
 # 09 · Security
 
-> **In one sentence:** nobody holds a long-lived cloud key — people sign in with SSO, robots get short-lived tokens through OIDC — and every role, including each project's Lambda, can only touch what it needs.
+> **In one sentence:** AWS access needs no long-lived keys — people sign in with SSO, robots get short-lived tokens through OIDC — and each role is scoped to dr4w; the remaining long-lived credential is the Cloudflare deploy token.
 > **Reading time:** ~11 min · **Level:** 🟢 beginner-friendly, 🔵 expert section marked
 
 ## Why this matters
@@ -39,27 +39,33 @@ flowchart LR
 | Who | How it signs in | What it can do |
 |---|---|---|
 | You (laptop) | `aws sso login --profile dr4w` → role `HumanAdmin` | everything; only place bootstrap is applied |
-| PR checks | OIDC → `dr4w-ci-plan` | read-only + state lock files: can plan, can't change |
+| PR checks | OIDC → `dr4w-ci-plan` | can't change anything — but AWS's `ReadOnlyAccess` can *read* every S3 object and DynamoDB item in the shared account, including state with the origin secrets |
 | Deploys | OIDC → `dr4w-ci-deploy`, only for jobs in the `production` environment | create/change `dr4w-*` resources; every role it creates must carry `dr4w-boundary`; can't touch its own role, the boundary or the state bucket's settings |
 | hello's Lambda | its role `dr4w-hello-prod-api` | its own table, the bus, its own SSM parameters |
 
 The roles are defined in `infra/bootstrap/ci-roles.tf` and the ceiling in
 `infra/bootstrap/boundary.tf`. The OIDC trust uses the repo's **immutable** identity
-(`repo:Dr4wOne@279559492/dr4w@1420042428:…`), so a different repo with the same name gets nothing.
+(`repo:Dr4wOne@279559492/dr4w@1420042428:…` — GitHub's fixed numeric IDs for the owner and the repo),
+so a different repo with the same name gets nothing. In IAM words: a role's *trust* policy says who
+may *assume* it (put on that key card); `ReadOnlyAccess` is AWS's built-in "look, don't touch" policy.
 
 **Secrets** and where they live (full list: `docs/security.md`):
 - the Worker ↔ API **origin secret**: SSM SecureString + Worker secret;
 - the **Cloudflare API token**: a GitHub environment secret, only visible to deploy jobs;
 - local dev uses a fixed, harmless `dev-origin-secret` in git-ignored files.
 
-**Abuse protection:** API Gateway throttles each project (50 requests/s, burst 100), so someone
-who finds the AWS URL can neither bypass the secret nor run up a large bill.
+**Abuse protection:** someone who finds the AWS URL can't get past the secret (they get `403`). API
+Gateway throttling (50 requests/s, burst 100 per project) limits the *rate*, not the bill: rejected
+requests still invoke Lambda, so a sustained flood could cost on the order of $185/month per project,
+and the $10 budget only sends email. Rate limiting in Cloudflare and an automatic stop are in the backlog.
 
 ## Try it
 ```bash
 pnpm run doctor
 curl -s -o /dev/null -w '%{http_code}\n' "$(AWS_PROFILE=dr4w aws ssm get-parameter --name /dr4w/hello/prod/api_url --query Parameter.Value --output text)/api/notes"
 ```
+`pnpm run doctor` checks your tools' versions, Docker, your AWS SSO session, GitHub login, the
+Claude plugins, and whether long-lived AWS keys exist on the machine.
 Expected: `doctor` lists your SSO session (or tells you to `aws sso login --profile dr4w`) and
 warns about any long-lived keys it finds; the `curl` to the raw AWS URL prints `403`.
 
@@ -70,9 +76,13 @@ warns about any long-lived keys it finds; the `curl` to the raw AWS URL prints `
 - **Privilege escalation guard:** `iam:CreateRole`/`PutRolePolicy` require
   `iam:PermissionsBoundary = dr4w-boundary`; explicit denies cover `dr4w-ci-*` roles, the boundary
   and `DeleteRolePermissionsBoundary`. Simulated with the IAM policy simulator on 2026-10-15.
-- **Accepted risks:** the origin secret is in OpenTofu state (encrypted bucket, admins and CI
-  roles only); rejected requests still invoke Lambda (throttling caps cost); the plan role's
-  `ReadOnlyAccess` can read state. No user authentication exists in v1.
+- **Known gaps (backlog in `docs/STATUS.md`):** the plan role is trusted by any same-repo PR or branch
+  and has account-wide read access, so a PR that edits `ci.yml` can read data and state; the deploy
+  role could delete old state versions; build steps run *after* AWS credentials are loaded, so a
+  malicious dependency script would get them; the Cloudflare token is long-lived and can edit DNS
+  for the whole `dr4w.io` zone; the origin secret is a static bearer token (rotation = a short 403
+  window). The `production` environment's branch rule and branch protection are GitHub settings, not code.
+  No user authentication exists in v1, so the API is writable by any visitor.
 - **Shared-account risks** (`docs/STATUS.md` → Known issues): root access keys on the laptop, and
   an unrelated role `gha-sandbox` that trusts every `Dr4wOne` repo's `main`.
 - **Public repo hygiene:** secret scanning + push protection on; nothing secret is committed; the account ID is not a secret.

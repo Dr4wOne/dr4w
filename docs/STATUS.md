@@ -17,7 +17,7 @@ events (`echo`) · M5 idea pipeline + polish — **all done** (2026-10-14/15). O
 acceptance criteria: `docs/SPEC.md` §9. Dry run: `ideas/guestbook/` (idea → live in 12 m 39 s).
 
 ## In progress
-- The dr4w Handbook (`docs/handbook/README.md`): H1 TOC + H2 chapters 1–11 written, diagrams validated (`pnpm docs:diagrams`); H3 (chapters 12–15, appendices, reader tests) next.
+- The dr4w Handbook (`docs/handbook/README.md`): **done**, last reviewed 2026-10-15 (beginner + expert reader tests; findings fixed in text, code items in the hardening backlog below).
 
 ## Next up
 1. **~2026-10-22:** check real idle cost in Cost Explorer (`docs/costs.md`); replace the estimate.
@@ -28,13 +28,34 @@ acceptance criteria: `docs/SPEC.md` §9. Dry run: `ideas/guestbook/` (idea → l
 | Item | Impact | Where |
 |---|---|---|
 | Root access keys in `~/.aws/credentials` (default profile) | Spec DoD "no AWS keys anywhere" not met on the laptop | Delete in console + file |
-| `gha-sandbox` role (not dr4w) trusts every `Dr4wOne` repo's `main` with PowerUserAccess | Shared-account risk | Narrow its trust (ADR 0003) |
+| `gha-sandbox` / `gha-prod` (not dr4w) trust every `Dr4wOne` repo (`gha-sandbox` also any `main`) with PowerUserAccess | Shared-account risk | Narrow to blog + mockshop environments (policies prepared 2026-10-15) |
 | Lambda quota 10 → reserved concurrency off | No per-project concurrency cap (throttling still on) | ADR 0009 |
 | SQS messages are not routed by `createLambdaHandler` | `queue` module needs a project-local handler | `packages/api-kit/src/events.ts` |
 | `queue`, `cron`, `bucket`, `pg-database` modules validated but never deployed | Untested in AWS | `infra/modules/README.md` |
 | Idle cost not yet measured (estimate only) | Spec DoD item open | `docs/costs.md` |
 | PR previews not built | By decision | ADR 0014 |
 | Spec said private repo, dedicated Vite proxy, inline Lambda zips | Built differently | ADRs 0002, 0005, 0010 |
+
+## Hardening backlog (from the handbook expert review, 2026-10-15)
+Code/infra changes — each needs a PR, and the bootstrap items a laptop apply with a "go".
+
+| Priority | Item | Where |
+|---|---|---|
+| P1 | echo swallows every cancelled transaction as a duplicate → check `CancellationReasons` for `ConditionalCheckFailed`, rethrow the rest | `apps/echo/api/src/data/counter.ts` |
+| P1 | Failed event handlers are discarded after Lambda's 2 async retries → event-invoke config + SQS on-failure destination + target DLQ + `FailedInvocations` alarm | `infra/modules/event-subscription`, `project-api` |
+| P1 | Plan role uses account-wide `ReadOnlyAccess` (data + state readable from any same-repo PR/branch) → scoped `dr4w-*` read policy | `infra/bootstrap/ci-roles.tf` |
+| P1 | Deploy role can delete state object versions → deny `s3:DeleteObjectVersion` on the state bucket | `infra/bootstrap/ci-roles.tf` |
+| P1 | Abuse cost: 403 floods still bill (~$185/month per project at the throttle) → Cloudflare rate limiting on `/api/*`, budget action / alarm that stops the Lambda | Cloudflare, `infra/platform` |
+| P1 | hello list ignores pagination (> 1 MB silently incomplete) | `apps/hello/api/src/data/notes.ts` |
+| P2 | Concurrency alarms (`Throttles`, `ConcurrentExecutions`); reserved concurrency once quota allows | `project-api` |
+| P2 | PITR on by default; `on_demand_throughput` caps | `infra/modules/dynamo-table` |
+| P2 | `events:source` condition on `PutEvents`; per-project prefixes in `dr4w-boundary` where feasible | `project-api`, `boundary.tf` |
+| P2 | Build before assuming AWS roles (supply-chain exposure) | `.github/workflows/ci.yml`, `deploy.yml` |
+| P2 | Emergency stop as a tofu variable (manual stop is undone by the next deploy) | `project-api` |
+| P2 | `exposes` changes should redeploy consumers; scheduled all-projects plan for drift | `scripts/changed-projects.ts`, workflows |
+| P2 | Origin secret: accept current + previous during rotation; keep last-known value if SSM fails | `packages/api-kit/src/origin-secret.ts` |
+| P2 | Cloudflare token: expiry + rotation schedule; per-project scope if possible | `docs/guides/secrets.md` |
+| P3 | Publish outbox (no duplicate notes on retry); dedicated AWS account | ADR 0003 |
 
 ## Recent decisions (highest number first)
 1. [0017 Caveman and ponytail on by default](decisions/0017-caveman-and-ponytail-by-default.md)

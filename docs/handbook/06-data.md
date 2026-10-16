@@ -23,7 +23,8 @@ empty cabinet sitting there.
 
 ### One file defines the table
 `apps/hello/infra/tables.json` declares the keys. OpenTofu reads it to create the real table
-(`module "tables"` in `apps/hello/infra/main.tf`, module `infra/modules/dynamo-table`), and
+(`module "tables"` in `apps/hello/infra/main.tf`, using the reusable building block — a *module*,
+chapter 7 — `infra/modules/dynamo-table`), and
 `scripts/seed.ts` reads the same file to create the local table in dynamodb-local. Because there
 is only one definition, local and cloud can't drift.
 
@@ -49,26 +50,32 @@ erDiagram
   HELLO_MAIN ||..o{ ECHO_MAIN : "Note.Created.v1 counted by"
 ```
 - **hello** (`apps/hello/api/src/data/notes.ts`): each note is an item with `pk = "NOTE"` and
-  `sk = <id>`. Listing queries the `NOTE` partition and sorts by `createdAt` in memory — fine for
-  small lists.
+  `sk = <id>`. Listing loads the `NOTE` partition and sorts it by `createdAt` in the Lambda's code — fine for small
+  lists, but one query returns at most 1 MB, and the code doesn't page further (`apps/hello/api/src/data/notes.ts`),
+  so beyond roughly a few thousand notes the list is silently incomplete (`docs/STATUS.md` → Known issues).
 - **echo** (`apps/echo/api/src/data/counter.ts`): one counter item (`pk = "COUNTER"`), plus one
   short-lived item per event id (`pk = "EVENT#<id>"`) that expires after 7 days through DynamoDB's
   **TTL** feature (`ttlAttribute: "expiresAt"` in `apps/echo/infra/tables.json`). Both are written
-  in a single **transaction**, so a redelivered event can't be counted twice.
+  in a single **transaction**, so a redelivered event can't be counted twice. (Known bug: the code
+treats *every* cancelled transaction as a duplicate, so a write conflict between two events drops
+one — it should check the cancellation reason; `docs/STATUS.md`.)
 
 ### Names and access
 Tables are named `dr4w-<project>-<env>-<key>` (`dr4w-hello-prod-main`) and have deletion
-protection on. The project's Lambda gets read/write on exactly its own table — the
-`iam_statements` output of `infra/modules/dynamo-table/outputs.tf`. Another project gets access
+protection on (destroying one needs a deliberate extra step, `docs/guides/destroy-project.md`). The
+project's Lambda gets read/write on exactly its own table: the module returns a ready-made
+permission list (`iam_statements` in `infra/modules/dynamo-table/outputs.tf`; permissions are chapter 9). Another project gets access
 only if the owner grants it (chapter 8).
 
 ### The optional Postgres
 For data that really needs SQL joins, the platform can create one shared **Aurora Serverless v2**
 PostgreSQL cluster (`infra/platform/postgres.tf`, off by default) and one database per project
 (`infra/modules/pg-database`). Lambdas talk to it over the **RDS Data API** (HTTP), so no network
-setup is needed. It pauses after 5 idle minutes; the next query waits about 15 seconds.
+setup is needed. Its size is measured in ACUs (Aurora capacity units); it scales to 0 ACU — paused —
+after 5 idle minutes, and the next query waits about 15 seconds.
 
 ## Try it
+Needs Docker and the AWS CLI (`docs/setup-new-machine.md`); the keys are dummies because dynamodb-local doesn't check them.
 ```bash
 pnpm seed hello
 AWS_ACCESS_KEY_ID=local AWS_SECRET_ACCESS_KEY=local aws dynamodb describe-table \
@@ -85,10 +92,16 @@ Expected: `HASH pk` and `RANGE sk`, created locally from `apps/hello/infra/table
   throughput limits (roughly 1,000 writes/s, 3,000 reads/s per partition). Shard the key if a
   project ever gets near that.
 - **Idempotency pattern:** echo's `TransactWriteItems` = conditional `Put` of the event-id item +
-  `ADD` on the counter. `TransactionCanceledException` ⇒ duplicate ⇒ ignored. Transactions cost 2×
-  the write units of normal writes.
-- **No PITR by default** (it costs per GB-month); no backups beyond DynamoDB's own durability.
-  Deletion protection guards against `tofu destroy` accidents (`docs/guides/destroy-project.md`).
+  `ADD` on the counter. Only a `ConditionalCheckFailed` cancellation means "duplicate"; conflicts and
+  throttling must be rethrown so the event is retried (today they're swallowed — a bug). Transactions
+  cost 2× the write units of normal writes, and every event touches the one `COUNTER` item.
+- **No PITR by default** (point-in-time recovery; for tables this small it would cost cents — turning
+  it on is in the backlog). The public API has no user auth, so anyone can delete notes through the
+  Worker, and without PITR that loss is permanent. Deletion protection guards only against
+  `tofu destroy` (`docs/guides/destroy-project.md`).
+- **Key changes replace the table:** editing `hashKey`/`rangeKey` in `tables.json` forces a new
+  table; deletion protection then stops the deploy halfway — migrate data deliberately instead.
+- **On-demand is uncapped:** no maximum throughput is set, so cost follows traffic (chapter 10).
 - **When Postgres:** relational queries, ad-hoc reporting, or strong cross-entity constraints.
   Costs storage (~$1–3/month) plus ~$0.40/month per Secrets Manager secret even when paused
   (`docs/decisions/0015-postgres-via-data-api.md`). Never deployed so far.

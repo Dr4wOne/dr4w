@@ -16,6 +16,10 @@ There are four places things happen:
 
 Users only ever see Cloudflare. Cloudflare quietly forwards data requests to AWS.
 
+Names you'll meet below (each gets its own chapter): **Lambda** runs your API code on demand,
+**API Gateway** is its front door, **DynamoDB** is the database, **SSM Parameter Store** (AWS
+Systems Manager) holds settings and secrets, and **EventBridge** carries events between projects.
+
 ### Legend (same colors in every diagram)
 🟧 AWS · 🟨 Cloudflare · ⬛ GitHub · 🟩 your laptop · ⬜ people
 
@@ -90,20 +94,23 @@ mindmap
 ```
 
 The shared platform pieces, created once (chapter 7):
-- **Bootstrap:** the storage for infrastructure state, and the roles GitHub uses to deploy.
-- **Platform:** the event bus `dr4w-bus`, the alert email topic, and a $10 monthly budget alarm.
+- **Bootstrap:** a storage bucket for OpenTofu's record of what exists (its *state*, chapter 7), and
+  the permission sets (*roles*, chapter 9) GitHub uses to deploy.
+- **Platform:** the event bus `dr4w-bus`, an email list for alerts (an SNS *topic*), and a $10 monthly budget alarm.
 
 ## Try it
 ```bash
 ls apps packages infra/modules
 cat apps/hello/project.json
 ```
-Expected: `echo hello`, the three packages, eight modules, and hello's manifest with its
-`subdomain`, `exposes` and `ports`.
+Expected: the project folders `echo` and `hello`; the packages `api-kit`, `contracts`, `web-kit`; the eight
+modules (`bucket cron dynamo-table event-subscription pg-database project-api project-ref queue`);
+and hello's manifest — `project.json`, a small file with its name, subdomain, which projects may
+use it (`exposes`) and its local ports.
 
 ## 🔵 Expert notes
 - **Same origin by design:** the browser only calls `hello.dr4w.io/api/*`; the Worker forwards to
-  the execute-api URL with a shared secret. No CORS, no extra DNS or certificates for the API
+  the API Gateway's own AWS address (the "execute-api URL") with a shared secret. No CORS, no extra DNS or certificates for the API
   (ADR `docs/decisions/0001-baseline-stack.md`). Cost: every API call takes an extra hop through the Worker.
 - **Isolation unit = project:** one Worker, one Lambda, one table, one state file per project
   (`projects/<p>/prod/terraform.tfstate`). A broken project can't break another's deploy.

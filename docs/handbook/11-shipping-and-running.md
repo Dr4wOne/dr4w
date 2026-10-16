@@ -11,8 +11,9 @@ dr4w makes the local setup look like production and makes merging the only way t
 Think of a restaurant kitchen with a strict routine:
 - you cook a test plate in the **test kitchen** (your laptop, `pnpm dev`);
 - the head chef checks every new recipe card before it goes on the menu (**CI on the pull request**);
-- once approved, the recipe goes to the real kitchen and the first plate is tasted before guests
-  get it (**deploy + smoke test**);
+- once approved, the recipe goes to the real kitchen, and a taster checks the first plates that
+  guests are already getting (**deploy, then a smoke test on the live site** — there is no staging
+  step and no automatic rollback);
 - if a dish goes wrong, you put the previous recipe card back (**rollback**).
 
 ## How it works in dr4w
@@ -36,9 +37,10 @@ flowchart LR
   classDef local fill:#7BC67E,stroke:#2e6b30,color:#000
 ```
 `scripts/dev.ts` starts Docker's dynamodb-local, creates the tables from `tables.json`, then runs
-each project's API (`tsx watch src/local.ts`) and web (`vite`, which runs `worker/index.ts` in
-Cloudflare's local runtime). `pnpm dev:cloud <p>` keeps the local servers but points the API at the
-**real** AWS table (never at the real event bus). Details: `docs/guides/local-dev.md`.
+each project's API (`tsx watch src/local.ts` — runs TypeScript and restarts on save) and web
+(`vite`, which runs `worker/index.ts` in *workerd*, Cloudflare's Worker runtime, on your laptop). `pnpm dev:cloud <p>` keeps the local servers but points the API at the
+**real** AWS table, for debugging with real data: reads are safe, writes change production, and
+events are only logged (never sent to the real bus). Details: `docs/guides/local-dev.md`.
 
 ### Pull request → merge → deploy
 Notice that the plan is shown on the PR before anything changes, and that only `main` deploys.
@@ -79,7 +81,7 @@ gitGraph
 |---|---|
 | Logs | `aws logs tail /aws/lambda/dr4w-<p>-prod-api` — one JSON line per request (`docs/guides/debugging-prod.md`) |
 | Alarms | `dr4w-<p>-prod-api-errors`, `-5xx` → email via `dr4w-alerts` |
-| Roll back | revert PR, or re-run an older deploy run (`docs/guides/rollback.md`) |
+| Roll back | revert PR (normal case), or re-run an older deploy run when you need it back *now* — which also reverts infra and can delete resources added since (`docs/guides/rollback.md`) |
 | Shared infra change | `platform.yml`, plan first, then apply (`docs/guides/deploy.md`) |
 | Remove a project | `destroy.yml` (`docs/guides/destroy-project.md`) |
 | Rotate secrets | `docs/guides/secrets.md` |
@@ -93,7 +95,7 @@ Expected: `pnpm check` runs the same checks as CI and ends with all tasks succes
 `pnpm changed --all` prints `["hello","echo"]` — the deploy order (hello first, because echo uses it).
 
 ## 🔵 Expert notes
-- **Deploy order and concurrency:** the deploy matrix runs with `max-parallel: 1` in dependency
+- **Deploy order and concurrency:** the deploy *matrix* (one job per changed project) runs with `max-parallel: 1` in dependency
   order and a per-project concurrency group, so one project's state is never applied twice at once.
 - **Atomic Worker release:** `wrangler deploy --var API_ORIGIN:… --secrets-file …` uploads code,
   the API address and the origin secret as one version.
@@ -101,7 +103,11 @@ Expected: `pnpm check` runs the same checks as CI and ends with all tasks succes
   `/api/health` for up to 5 minutes before the smoke test).
 - **What's not covered:** no canary or blue/green (a bad deploy is fixed by a fast revert); no PR
   previews (`docs/decisions/0014-no-pr-previews.md`); docs-only changes deploy nothing.
-- **Pinned supply chain:** third-party actions pinned to commit SHAs; Dependabot with a 3-day cooldown matching pnpm's release-age rule.
+- **Pinned supply chain:** third-party actions pinned to commit SHAs; Dependabot with a 3-day cooldown
+  matching pnpm's release-age rule. Gap: builds run after AWS credentials are loaded (backlog).
+- **Partial deploys:** with `fail-fast: false`, a shared change can reach `hello` and fail on `echo`; a
+  failed deploy isn't retried, and the next push deploys only *its* changed projects — prod can lag
+  `main` until you run `gh workflow run deploy.yml` (all projects).
 - **Local fidelity limits:** dynamodb-local is in-memory and not identical to DynamoDB (e.g. throttling
   and IAM aren't simulated); events are delivered by HTTP, not EventBridge (no retries or archive).
 
@@ -124,4 +130,4 @@ Expected: `pnpm check` runs the same checks as CI and ends with all tasks succes
 
 ## Learn more
 `docs/guides/deploy.md` · `docs/guides/local-dev.md` · GitHub Actions: https://docs.github.com/en/actions ·
-Playwright: https://playwright.dev · next: chapter 12 — the idea pipeline and AI workflow (Part IV)
+Playwright: https://playwright.dev · next: [12 · The idea pipeline and AI workflow](12-idea-pipeline-and-ai.md)

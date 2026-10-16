@@ -5,7 +5,7 @@
 
 ## Why this matters
 dr4w combines a dozen technologies. You don't need to master them, but you need a picture of what
-each one does, in plain words. Every term here will also be in the glossary (Appendix A, part of the next milestone).
+each one does, in plain words. Every term here is also in the glossary ([Appendix A](appendix-a-glossary.md)).
 
 ## The idea, simply
 
@@ -32,6 +32,10 @@ each one does, in plain words. Every term here will also be in the glossary (App
 - A **region** is one group of data centers (dr4w uses `us-east-1`, Virginia). The **edge** is
   hundreds of small locations close to users.
 - **Pay-per-use** prices are tiny per request; the **free tier** covers a lot of small usage.
+- The AWS services dr4w uses: **Lambda** (runs a *function* — your code — per request),
+  **API Gateway** (receives web requests and hands them to Lambda), **DynamoDB** (the database),
+  **SSM Parameter Store** (settings and secrets) and **EventBridge** (events between projects).
+  AWS names everything with an **ARN**, a long unique ID like `arn:aws:lambda:…:function:dr4w-hello-prod-api`.
 
 ### Part 3 — From code to production
 - **Git** records every change to the code as a **commit**. A **branch** is a parallel line of
@@ -48,7 +52,7 @@ each one does, in plain words. Every term here will also be in the glossary (App
 ## How it works in dr4w
 | Concept | Where you meet it |
 |---|---|
-| DNS, subdomain, HTTPS | `hello.dr4w.io`, set up automatically by Cloudflare (chapter 5) |
+| DNS, subdomain, HTTPS | `hello.dr4w.io`, record and certificate created automatically by Cloudflare (chapter 4, step 2) |
 | SPA + API + JSON | `apps/hello/web/src/App.tsx` calls `GET /api/notes` (chapter 4) |
 | Serverless, cold start | the Lambda `dr4w-hello-prod-api` (chapter 5) |
 | Region vs edge | Worker at the edge, Lambda in `us-east-1` (chapter 2) |

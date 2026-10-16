@@ -24,7 +24,7 @@ is still pending in `docs/STATUS.md`):
 | DynamoDB on-demand | ~$0 (cents of storage) | reads, writes, GB stored |
 | CloudWatch logs and alarms | ~$0 (first 10 alarms free; 2 per project) | log volume, alarm count |
 | EventBridge, S3, SSM, SNS, Budgets | ~$0 | events, bytes |
-| Cloudflare Workers (Free plan) | $0 | requests (100,000/day limit) |
+| Cloudflare Workers (Free plan) | $0 | `/api/*` requests (100,000/day limit; static files are free and unlimited) |
 | Aurora Postgres (**off**) | ~$1–3/month when on | storage, active minutes |
 
 **Today, idle, hello + echo + platform ≈ $0.00–0.10 per month.**
@@ -42,7 +42,7 @@ Prices are us-east-1 list prices checked on 2026-10-15 (marked † where the pag
 | Item | Small: 1,000 API requests/day | 100×: 100,000/day |
 |---|---|---|
 | Lambda requests ($0.20/M after 1M free) | $0 | $0.40 |
-| Lambda compute (150k GB-s, under 400k free) | $0 | $0 |
+| Lambda compute (150k GB-s — memory in GB × seconds run — under 400k free) | $0 | $0 |
 | API Gateway HTTP API (~$1.00/M †) | $0.03 | $3.00 |
 | DynamoDB writes ($0.625/M) + reads ($0.125/M) | $0.02 | $2.25 |
 | EventBridge events (~$1.00/M †) | $0.00 | $0.30 |
@@ -50,6 +50,7 @@ Prices are us-east-1 list prices checked on 2026-10-15 (marked † where the pag
 | Cloudflare Workers (`/api/*` counts; static files free) | $0 | $5 (Paid plan, at the 100k/day limit) |
 | **Total / month** | **≈ $0.05** | **≈ $11.40** |
 
+(Lists cost more than "1 read": a hello list call reads the whole partition, up to 128 read units per 1 MB.)
 Notice that at 100× the biggest items are the Workers plan, API Gateway and DynamoDB — and that the total passes the $10 budget, so you'd get an email before it becomes a problem.
 
 ```mermaid
@@ -61,8 +62,8 @@ xychart-beta
 ```
 
 ## Try it
-Billing → **Cost Explorer** → last 30 days → group by *Service*; then filter tag
-`managed-by = opentofu` and group by tag `project` (`docs/costs.md` explains activating the tag).
+Billing → **Cost Explorer** → last 30 days → group by *Service*; then filter by *tag* (a label
+OpenTofu puts on every dr4w resource) `managed-by = opentofu` and group by tag `project` (`docs/costs.md` explains activating the tag).
 Expected: dr4w's services in cents.
 
 ## 🔵 Expert notes
@@ -72,8 +73,13 @@ Expected: dr4w's services in cents.
   Lambda via a signed request would remove it, at the price of the current design's simplicity);
   DynamoDB access patterns (avoid scans; transactions cost double).
 - **Alarms** are the first item to cost money as projects multiply: 2 per project, free up to 10.
-- **Aurora** is the only "cost while idle" item, which is why it's off by default (`docs/decisions/0015-postgres-via-data-api.md`).
-- **Emergency stop:** set the Lambda's reserved concurrency to 0 (`docs/costs.md`); the static site keeps working.
+- **Aurora** is the only "cost while idle" item, which is why it's off by default. "~$1–3" assumes
+  it stays paused: anything that queries it more often than every 5 minutes keeps it awake, at least
+  0.5 ACU × 730 h ≈ $40+/month (`docs/decisions/0015-postgres-via-data-api.md`).
+- **Abuse is the real cost risk:** throttling caps the rate at 50 requests/s, which is still
+  ~130 M requests/month — roughly $185/month in API Gateway, Lambda and logs per project. The budget
+  only emails; nothing stops traffic automatically yet.
+- **Emergency stop:** set the Lambda's reserved concurrency (how many copies may run at once) to 0 (`docs/costs.md`); the static site keeps working.
 
 ## Common mistakes
 - Adding "just one" NAT gateway or load balancer — each has a fixed monthly floor (`docs/dos-and-donts.md` → Infra).

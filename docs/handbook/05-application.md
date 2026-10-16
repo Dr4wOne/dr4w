@@ -37,11 +37,15 @@ secret `ORIGIN_SECRET` is uploaded with the same deploy (chapter 11).
 
 ### The web app
 `apps/hello/web/src/App.tsx` is plain React. It never builds URLs by hand: `apps/hello/web/src/api.ts`
-creates a typed client from the API's own type (`createApi<AppType>()` in `packages/web-kit`).
+creates a client that knows the API's routes and data shapes (`createApi<AppType>()` in
+`packages/web-kit`; the `<AppType>` part hands it the API's type description).
 If the API changes a route or a response field, the web app stops compiling instead of failing at runtime.
+(That protects the build only: after a deploy, browsers may still run the previous app for a while,
+and the Lambda is deployed before the Worker — so keep API changes backward-compatible.)
 
 ### The Lambda and Hono
-One Lambda per project (`dr4w-hello-prod-api`) runs one Hono app. Notice that every request passes
+One Lambda per project (`dr4w-hello-prod-api`) runs one Hono app. Its code is built into one file
+and uploaded through an S3 bucket at deploy time. Notice that every request passes
 the same middleware before reaching a route.
 ```mermaid
 flowchart LR
@@ -67,14 +71,15 @@ validates with them; the web app gets the inferred TypeScript types; events reus
 (`packages/contracts/src/events/hello.ts`).
 
 ## Try it
-Add a field to the schema locally and watch both sides react:
+Change the shared schema locally and watch the web app catch it:
 ```bash
 pnpm --filter hello-api test
 pnpm --filter hello-web typecheck
 ```
 Expected: both pass. Then, as an experiment, rename the `title` field of `Note` to `name` in
 `packages/contracts/src/hello.ts` (and in its `.pick({ title: true, … })` for `CreateNote`) and
-rerun `pnpm --filter hello-web typecheck` — it fails in `App.tsx`, which still uses `title`. Undo with `git checkout packages/contracts/src/hello.ts`.
+rerun `pnpm --filter hello-web typecheck` — it fails in `App.tsx`, which still uses `title`.
+(`.pick({ title: true })` is zod for "take only these fields from `Note`".) Undo with `git checkout packages/contracts/src/hello.ts`.
 
 ## 🔵 Expert notes
 - **Lambdalith:** one function per project, routing in Hono. Pros: fixed infra per project, shared
