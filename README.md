@@ -51,7 +51,7 @@ Deploy = merge a PR to `main` (`docs/guides/deploy.md`).
 |---|---|
 | Current state, known issues | `docs/STATUS.md` |
 | Every doc, by task | `docs/README.md` |
-| How it works | `docs/architecture.md` |
+| How it works | `docs/architecture.md`; beginner-to-expert guide: `docs/handbook/README.md` |
 | Why it's built this way | `docs/decisions/` |
 | A file or folder | `docs/repo-map.md` |
 | Rules and patterns | `docs/conventions.md`, `docs/dos-and-donts.md` |

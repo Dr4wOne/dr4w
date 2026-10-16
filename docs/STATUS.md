@@ -17,8 +17,7 @@ events (`echo`) · M5 idea pipeline + polish — **all done** (2026-10-14/15). O
 acceptance criteria: `docs/SPEC.md` §9. Dry run: `ideas/guestbook/` (idea → live in 12 m 39 s).
 
 ## In progress
-- Docs & memory system (this branch): reference docs, guides, ADRs, session commands, `pnpm run doctor`, `pnpm docs:check`.
-- Next prompts queued: caveman + ponytail plugins (pinned, reviewed), then a focused handbook (to live in docs/handbook).
+- The dr4w Handbook (`docs/handbook/README.md`): H1 TOC + H2 chapters 1–11 written, diagrams validated (`pnpm docs:diagrams`); H3 (chapters 12–15, appendices, reader tests) next.
 
 ## Next up
 1. **~2026-10-22:** check real idle cost in Cost Explorer (`docs/costs.md`); replace the estimate.

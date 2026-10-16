@@ -14,6 +14,7 @@ Find and fix documentation that the current branch made stale.
    - `infra/bootstrap/**` → `docs/security.md`, `docs/bootstrap.md`.
    - `scripts/**`, root `package.json` scripts → root `README.md` Daily commands, `docs/repo-map.md`.
    - `.claude/commands/**` → root `README.md`, `CLAUDE.md`, `ideas/README.md`.
-   - Any of the above → the handbook chapters that describe it (docs/handbook, once it exists).
+   - Any of the above → the handbook chapters that describe it (`docs/handbook/README.md` lists them);
+     if a chapter's diagram changed, run `pnpm docs:diagrams`.
 3. Check that quoted snippets and paths in those docs still match the code.
 4. Fix what's stale (plain English, one home per fact), run `pnpm docs:check`, and list what you changed and why.
