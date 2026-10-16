@@ -21,14 +21,12 @@ acceptance criteria: `docs/SPEC.md` §9. Dry run: `ideas/guestbook/` (idea → l
 
 ## Next up
 1. **~2026-10-22:** check real idle cost in Cost Explorer (`docs/costs.md`); replace the estimate.
-2. When the Lambda quota reaches 1000 (AWS case open): set `reserved_concurrency = 10` in each `module "api"` (ADR 0009).
-3. First real idea through `/idea`.
+2. First real idea through `/idea`.
 
 ## Known issues / gaps vs spec
 | Item | Impact | Where |
 |---|---|---|
 | `gha-sandbox` / `gha-prod` (not dr4w) trust every `Dr4wOne` repo (`gha-sandbox` also any `main`) with PowerUserAccess | Shared-account risk — **accepted for now** (2026-10-15) | Narrowed policies (blog + mockshop environments only) were prepared; apply when ready |
-| Lambda quota 10 → reserved concurrency off | No per-project concurrency cap (throttling still on) | ADR 0009 |
 | SQS messages are not routed by `createLambdaHandler` | `queue` module needs a project-local handler | `packages/api-kit/src/events.ts` |
 | `queue`, `cron`, `bucket`, `pg-database` modules validated but never deployed | Untested in AWS | `infra/modules/README.md` |
 | Idle cost not yet measured (estimate only) | Spec DoD item open | `docs/costs.md` |
@@ -46,7 +44,7 @@ Code/infra changes — each needs a PR, and the bootstrap items a laptop apply w
 | P1 | Deploy role can delete state object versions → deny `s3:DeleteObjectVersion` on the state bucket | `infra/bootstrap/ci-roles.tf` |
 | P1 | Abuse cost: 403 floods still bill (~$185/month per project at the throttle) → Cloudflare rate limiting on `/api/*`, budget action / alarm that stops the Lambda | Cloudflare, `infra/platform` |
 | P1 | hello list ignores pagination (> 1 MB silently incomplete) | `apps/hello/api/src/data/notes.ts` |
-| P2 | Concurrency alarms (`Throttles`, `ConcurrentExecutions`); reserved concurrency once quota allows | `project-api` |
+| P2 | Concurrency alarms (`Throttles`, `ConcurrentExecutions`) | `project-api` |
 | P2 | PITR on by default; `on_demand_throughput` caps | `infra/modules/dynamo-table` |
 | P2 | `events:source` condition on `PutEvents`; per-project prefixes in `dr4w-boundary` where feasible | `project-api`, `boundary.tf` |
 | P2 | Build before assuming AWS roles (supply-chain exposure) | `.github/workflows/ci.yml`, `deploy.yml` |

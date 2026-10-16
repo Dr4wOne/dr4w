@@ -73,7 +73,7 @@ aws service-quotas get-service-quota --profile dr4w --region us-east-1 \
   --service-code lambda --quota-code L-B99A9384 --query Quota.Value
 ```
 
-- **1000** → nothing to do. After M3 we can set `reserved_concurrency = 10` in the module.
+- **1000** → nothing to do; projects set `reserved_concurrency = 10` (done 2026-10-15, ADR 0009).
 - **10** → request 1000 (free, usually approved within a day):
   ```bash
   aws service-quotas request-service-quota-increase --profile dr4w --region us-east-1 \
