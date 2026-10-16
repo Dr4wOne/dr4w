@@ -6,6 +6,12 @@ One monorepo, shared infrastructure modules, and Claude slash commands for the i
 
 **Live:** [hello.dr4w.io](https://hello.dr4w.io) (notes) · [echo.dr4w.io](https://echo.dr4w.io) (counts hello's notes) — current state in [docs/STATUS.md](docs/STATUS.md).
 
+**External projects** (own repos, same rules):
+| Project | URL | Repo | What |
+|---|---|---|---|
+| blog | https://blog.dr4w.io | [Dr4wOne/blog](https://github.com/Dr4wOne/blog) | Daniel's personal blog; static Astro site on a Worker, deployed like a dr4w project ([its directives](https://github.com/Dr4wOne/blog/blob/main/docs/dr4w-directives.md)) |
+| landing | https://dr4w.io | `Dr4wOne/dr4w-landpage` (private) | Personal site; its Writing section reads the blog's `feed.json` at build time |
+
 ## Start here
 | If you want to… | Read, in this order |
 |---|---|

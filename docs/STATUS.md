@@ -1,6 +1,6 @@
 # Status
 
-**Last updated:** 2026-10-15 · as of `main` @ `baf72af` (+ branch `docs/memory-system`)
+**Last updated:** 2026-10-16 · as of `main` @ `49b5d1c`
 Update this file with `/handoff` at the end of every session.
 
 ## Live projects
@@ -8,6 +8,10 @@ Update this file with `/handoff` at the end of every session.
 |---|---|---|---|
 | hello | https://hello.dr4w.io | Notes CRUD; publishes `Note.Created.v1` | 2026-10-15 |
 | echo | https://echo.dr4w.io | Counts hello's `Note.Created.v1` events | 2026-10-15 |
+
+External (own repos): **blog** https://blog.dr4w.io ([Dr4wOne/blog](https://github.com/Dr4wOne/blog), live 2026-10-16) and the
+landing page https://dr4w.io, whose Writing section shows the latest issues and rebuilds when the blog
+publishes (`repository_dispatch: blog-published`).
 
 Platform: `dr4w-bus` (+ 7-day archive), `dr4w-alerts` (email confirmed), `dr4w-monthly` budget ($10).
 
@@ -27,7 +31,7 @@ acceptance criteria: `docs/SPEC.md` §9. Dry run: `ideas/guestbook/` (idea → l
 ## Known issues / gaps vs spec
 | Item | Impact | Where |
 |---|---|---|
-| `gha-sandbox` / `gha-prod` (not dr4w) trust every `Dr4wOne` repo (`gha-sandbox` also any `main`) with PowerUserAccess | Shared-account risk — **accepted for now** (2026-10-15) | Narrowed policies (blog + mockshop environments only) were prepared; apply when ready |
+| `gha-sandbox` / `gha-prod` (not dr4w) trust every `Dr4wOne` repo (`gha-sandbox` also any `main`) with PowerUserAccess | Shared-account risk — **accepted for now** (2026-10-15). The blog no longer uses AWS at all (2026-10-16), so its environments can be dropped from the narrowed policies | Narrowed policies were prepared; apply when ready |
 | Lambda quota 10 → reserved concurrency off | No per-project concurrency cap (throttling still on) | ADR 0009 |
 | SQS messages are not routed by `createLambdaHandler` | `queue` module needs a project-local handler | `packages/api-kit/src/events.ts` |
 | `queue`, `cron`, `bucket`, `pg-database` modules validated but never deployed | Untested in AWS | `infra/modules/README.md` |
