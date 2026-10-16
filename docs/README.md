@@ -6,7 +6,7 @@
 | Set up a new laptop | `docs/setup-new-machine.md` |
 | Set up the AWS/Cloudflare/GitHub accounts from zero (one time) | `docs/bootstrap.md` |
 | Understand how dr4w works | `docs/architecture.md` |
-| Learn dr4w from scratch, with the why behind it | The dr4w Handbook (planned — next) |
+| Learn dr4w from scratch, with the why behind it | `docs/handbook/README.md` (chapters 1–11 so far) |
 | Know which version of a tool we use | `docs/stack.md` |
 | Find a file or folder | `docs/repo-map.md` |
 | Follow naming, git, error and logging rules | `docs/conventions.md` |

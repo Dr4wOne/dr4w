@@ -22,7 +22,8 @@
     "ideas": "tsx scripts/ideas-status.ts",
     "dev:cloud": "tsx scripts/dev.ts --cloud",
     "doctor": "tsx scripts/doctor.ts",
-    "docs:check": "tsx scripts/docs-check.ts"
+    "docs:check": "tsx scripts/docs-check.ts",
+    "docs:diagrams": "bash scripts/check-diagrams.sh"
   },
   "devDependencies": {
     "@biomejs/biome": "catalog:",
