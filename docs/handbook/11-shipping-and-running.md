@@ -49,7 +49,7 @@ flowchart TB
   pr["Pull request"]:::github --> chk["ci.yml: check<br/>lint, contracts, docs, typecheck,<br/>tests, build, infra:check"]:::github
   chk --> pl["ci.yml: plan<br/>changed projects only,<br/>comment on PR"]:::github
   pl --> m{"merge to main"}
-  m --> ch["deploy.yml: changes<br/>providers first"]:::github
+  m --> ch["deploy.yml: changes<br/>projects others use go first"]:::github
   ch --> ap["tofu apply<br/>Lambda code ships here"]:::aws
   ap --> wr["wrangler deploy<br/>+ origin secret"]:::cf
   wr --> sm["Playwright smoke test<br/>on the live URL"]:::github
@@ -62,6 +62,7 @@ flowchart TB
   project. The list is sorted so providers deploy before their consumers.
 - **Branch protection:** `main` only accepts changes through PRs whose `check` and `plan` passed.
 - **Smoke tests:** `apps/<p>/web/e2e/smoke.spec.ts` runs against `https://<sub>.dr4w.io` after every deploy.
+- **If a deploy fails,** nothing retries it: fix forward or rerun it (`gh workflow run deploy.yml -f project=<p>`).
 
 The branch flow in practice — notice that every change reaches `main` as one squashed commit:
 ```mermaid

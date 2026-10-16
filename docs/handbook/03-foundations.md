@@ -16,7 +16,10 @@ each one does, in plain words. Every term here is also in the glossary ([Appendi
 - A **domain** like `dr4w.io` is a human name for a server. **DNS** is the internet's phone book that
   turns names into addresses. `hello.dr4w.io` is a **subdomain** of `dr4w.io`.
 - A **CDN** (content delivery network) keeps copies of files in many cities, so pages load from
-  somewhere close. Its servers are called **the edge**. Cloudflare is a CDN that can also run code.
+  somewhere close. Its servers are called **the edge**. Cloudflare is a CDN that can also run code:
+  a **Cloudflare Worker** is a small program on its servers — in dr4w it serves the pages and forwards `/api/*`.
+- Browsers block a page from calling an API on a *different* site unless that API opts in with
+  extra rules called **CORS**. Serving the page and the API from the same site (**same origin**) avoids that.
 - The **frontend** is what runs in the browser (buttons, forms). The **backend** runs on servers
   (saving data). They talk through an **API**: a list of URLs like `GET /api/notes` that return
   data, usually as **JSON** (text that looks like `{"title": "hi"}`).
@@ -35,6 +38,7 @@ each one does, in plain words. Every term here is also in the glossary ([Appendi
 - The AWS services dr4w uses: **Lambda** (runs a *function* — your code — per request),
   **API Gateway** (receives web requests and hands them to Lambda), **DynamoDB** (the database),
   **SSM Parameter Store** (settings and secrets) and **EventBridge** (events between projects).
+  **S3** stores files in *buckets*, and **CloudWatch** keeps logs and raises alarms.
   AWS names everything with an **ARN**, a long unique ID like `arn:aws:lambda:…:function:dr4w-hello-prod-api`.
 
 ### Part 3 — From code to production
@@ -48,6 +52,10 @@ each one does, in plain words. Every term here is also in the glossary ([Appendi
   instead of clicking in a web console. A tool (dr4w uses **OpenTofu**) compares the files with
   reality and makes the changes. The files can be reviewed like code.
 - A **monorepo** keeps many projects in one repository, so they share tools and libraries.
+- **TypeScript** is JavaScript with types; a *typecheck* finds mismatches before the code runs, and
+  *lint* finds style and bug patterns. Both run on every PR.
+- **Docker** runs ready-made programs in isolated containers on your laptop — dr4w uses it for
+  *dynamodb-local*, a stand-in for DynamoDB.
 
 ## How it works in dr4w
 | Concept | Where you meet it |

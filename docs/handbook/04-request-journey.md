@@ -59,7 +59,7 @@ Step by step, with the real files:
 5. **Lambda entry.** `apps/hello/api/src/lambda.ts` exports
    `createLambdaHandler(app, events)` from `packages/api-kit/src/events.ts`. It sees an HTTP event
    (not a bus event) and passes it to the Hono app.
-6. **Middleware.** `apps/hello/api/src/app.ts` runs, in order: `requestLogger()` (one JSON log
+6. **Middleware** (code that runs before every route). `apps/hello/api/src/app.ts` runs, in order: `requestLogger()` (one JSON log
    line), then `originSecret()` — it compares the header with the secret read from SSM in
    *constant time* (always the same duration, so an attacker can't guess it character by
    character from response times); a mismatch returns `403` and stops here.
@@ -82,7 +82,8 @@ curl -s -X POST localhost:5173/api/notes -H 'content-type: application/json' -d 
 curl -s localhost:8787/api/notes -o /dev/null -w '%{http_code}\n'
 ```
 Expected: the first call returns `201` with a note — port 5173 is the local Worker, like the
-real site; the second returns `403` — port 8787 is the API itself, without the Worker in front, and — calling the API directly, without the Worker's secret, is refused. Stop `pnpm dev` with Ctrl-C.
+real site. The second returns `403`: port 8787 is the API itself, without the Worker, so the request
+has no secret and is refused. Stop `pnpm dev` with Ctrl-C.
 
 ## 🔵 Expert notes
 - **Latency budget:** edge → `us-east-1` round trip + API Gateway + Lambda + one DynamoDB write +

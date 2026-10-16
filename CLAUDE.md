@@ -10,7 +10,7 @@
 ## Never
 - Run `tofu apply`/`destroy`, `wrangler deploy`, merge to `main`, or change AWS/Cloudflare/GitHub settings without an explicit "go".
 - Commit secrets, `.env.local`, `.dev.vars`, state or plan files. The repo is **public**.
-- Use the default AWS profile (root keys). Always `AWS_PROFILE=dr4w`.
+- Use AWS without a profile, or create access keys. Always `AWS_PROFILE=dr4w` (SSO).
 - Add raw `resource` blocks to a project stack, wildcard IAM actions, NAT/VPC Lambdas/provisioned capacity/dashboards.
 - Touch the `dr4w.io` apex or `www` (owned by `Dr4wOne/dr4w-landpage`).
 - Add `minimumReleaseAgeExclude`: pin an older version in the `catalog:` instead.

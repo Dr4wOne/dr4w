@@ -27,8 +27,7 @@ acceptance criteria: `docs/SPEC.md` §9. Dry run: `ideas/guestbook/` (idea → l
 ## Known issues / gaps vs spec
 | Item | Impact | Where |
 |---|---|---|
-| Root access keys in `~/.aws/credentials` (default profile) | Spec DoD "no AWS keys anywhere" not met on the laptop | Delete in console + file |
-| `gha-sandbox` / `gha-prod` (not dr4w) trust every `Dr4wOne` repo (`gha-sandbox` also any `main`) with PowerUserAccess | Shared-account risk | Narrow to blog + mockshop environments (policies prepared 2026-10-15) |
+| `gha-sandbox` / `gha-prod` (not dr4w) trust every `Dr4wOne` repo (`gha-sandbox` also any `main`) with PowerUserAccess | Shared-account risk — **accepted for now** (2026-10-15) | Narrowed policies (blog + mockshop environments only) were prepared; apply when ready |
 | Lambda quota 10 → reserved concurrency off | No per-project concurrency cap (throttling still on) | ADR 0009 |
 | SQS messages are not routed by `createLambdaHandler` | `queue` module needs a project-local handler | `packages/api-kit/src/events.ts` |
 | `queue`, `cron`, `bucket`, `pg-database` modules validated but never deployed | Untested in AWS | `infra/modules/README.md` |

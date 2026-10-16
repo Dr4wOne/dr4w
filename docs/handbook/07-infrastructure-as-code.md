@@ -21,6 +21,7 @@ A **provider** is the plug-in that knows how to talk to one cloud (here: AWS).
 ## How it works in dr4w
 
 ### Three layers
+Each layer is a *stack*: one folder of `.tf` files with its own state.
 Notice that each layer has its own state file and is changed by a different actor.
 ```mermaid
 flowchart TB
@@ -35,7 +36,7 @@ flowchart TB
   p -.->|platform/terraform.tfstate| s
   h -.->|projects/hello/prod/…| s
   e -.->|projects/echo/prod/…| s
-  lap["laptop, admin SSO"]:::local -->|applies| b
+  lap["laptop, admin sign-in"]:::local -->|applies| b
   ci["GitHub Actions"]:::github -->|platform.yml| p
   ci -->|deploy.yml| h
   ci -->|deploy.yml| e

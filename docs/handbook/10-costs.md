@@ -93,7 +93,7 @@ Expected: dr4w's services in cents.
 <details><summary>Answers</summary>
 
 1. Every service bills per request or per byte, and none runs (or bills) while there are no requests.
-2. API Gateway throttling (50 requests/s, burst 100) per project.
+2. API Gateway throttling (50 requests/s, burst 100 per project) caps the rate — which bounds the cost (~$185/month per project worst case) but doesn't stop it.
 3. The Workers plan (a fixed $5 step) or API Gateway (the largest per-request item) — both scale with every API call.
 </details>
 

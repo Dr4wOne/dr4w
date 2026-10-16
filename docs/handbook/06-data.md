@@ -25,7 +25,8 @@ empty cabinet sitting there.
 `apps/hello/infra/tables.json` declares the keys. OpenTofu reads it to create the real table
 (`module "tables"` in `apps/hello/infra/main.tf`, using the reusable building block — a *module*,
 chapter 7 — `infra/modules/dynamo-table`), and
-`scripts/seed.ts` reads the same file to create the local table in dynamodb-local. Because there
+`scripts/seed.ts` reads the same file to create the local table in dynamodb-local (a stand-in for
+DynamoDB that runs in Docker on your laptop). Because there
 is only one definition, local and cloud can't drift.
 
 ### Data models
@@ -56,7 +57,8 @@ erDiagram
 - **echo** (`apps/echo/api/src/data/counter.ts`): one counter item (`pk = "COUNTER"`), plus one
   short-lived item per event id (`pk = "EVENT#<id>"`) that expires after 7 days through DynamoDB's
   **TTL** feature (`ttlAttribute: "expiresAt"` in `apps/echo/infra/tables.json`). Both are written
-  in a single **transaction**, so a redelivered event can't be counted twice. (Known bug: the code
+  in a single **transaction**, so a redelivered event can't be counted twice — the handler is
+  **idempotent** (handling an event twice has the same effect as once). (Known bug: the code
 treats *every* cancelled transaction as a duplicate, so a write conflict between two events drops
 one — it should check the cancellation reason; `docs/STATUS.md`.)
 

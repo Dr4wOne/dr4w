@@ -35,7 +35,7 @@ Two projects are live today:
 What you get as a builder:
 - `pnpm new <name>` creates a working project in seconds (`docs/guides/new-project.md`).
 - `pnpm dev <name>` runs it on your laptop, offline once installed (it uses Docker for a local database).
-- Merging a pull request on GitHub puts a project online — no manual clicks. (Shared platform changes are run by hand on purpose; chapter 7.)
+- Merging a pull request on GitHub normally puts a project online — no manual clicks (if a deploy fails, you rerun it; chapter 11). (Shared platform changes are run by hand on purpose; chapter 7.)
 - Claude Code (Anthropic's coding assistant) slash commands — typed instructions such as `/idea`, `/spec`, `/plan`, `/poc`, `/launch` — guide an idea from a
   sentence to a live URL. A dry run did it in 12 minutes 39 seconds (`ideas/guestbook/00-idea.md`).
 
@@ -59,7 +59,7 @@ Expected: a "Notes" page; your note appears at the top of the list.
 
 ## 🔵 Expert notes
 - **Design goal:** idle cost ≈ $0 per project and < $5/month for the whole platform, with no
-  long-lived cloud credentials anywhere (one known exception on the owner's laptop is tracked in `docs/STATUS.md`). Today's estimate is $0.00–0.10/month idle (`docs/costs.md`, not yet measured).
+  long-lived cloud credentials anywhere. Today's estimate is $0.00–0.10/month idle (`docs/costs.md`, not yet measured).
 - **Shape:** a pnpm/Turborepo monorepo; React SPA on Cloudflare Workers; one Lambda per project
   behind an API Gateway HTTP API; DynamoDB on-demand; OpenTofu modules; GitHub Actions with OIDC.
   Each choice and its alternatives: chapter 14 and `docs/decisions/`.

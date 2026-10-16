@@ -55,8 +55,8 @@ may *assume* it (put on that key card); `ReadOnlyAccess` is AWS's built-in "look
 - local dev uses a fixed, harmless `dev-origin-secret` in git-ignored files.
 
 **Abuse protection:** someone who finds the AWS URL can't get past the secret (they get `403`). API
-Gateway throttling (50 requests/s, burst 100 per project) limits the *rate*, not the bill: rejected
-requests still invoke Lambda, so a sustained flood could cost on the order of $185/month per project,
+Gateway throttling (50 requests/s, burst 100 per project) limits the *rate*, not the bill: requests
+refused by the secret check (`403`) still run the Lambda, so a sustained flood could cost on the order of $185/month per project,
 and the $10 budget only sends email. Rate limiting in Cloudflare and an automatic stop are in the backlog.
 
 ## Try it
@@ -83,8 +83,8 @@ warns about any long-lived keys it finds; the `curl` to the raw AWS URL prints `
   for the whole `dr4w.io` zone; the origin secret is a static bearer token (rotation = a short 403
   window). The `production` environment's branch rule and branch protection are GitHub settings, not code.
   No user authentication exists in v1, so the API is writable by any visitor.
-- **Shared-account risks** (`docs/STATUS.md` → Known issues): root access keys on the laptop, and
-  an unrelated role `gha-sandbox` that trusts every `Dr4wOne` repo's `main`.
+- **Shared-account risk** (`docs/STATUS.md` → Known issues): an unrelated role `gha-sandbox` trusts
+  every `Dr4wOne` repo's `main`; narrowed policies are prepared but not applied (accepted for now).
 - **Public repo hygiene:** secret scanning + push protection on; nothing secret is committed; the account ID is not a secret.
 
 ## Common mistakes

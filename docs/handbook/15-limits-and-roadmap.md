@@ -29,8 +29,8 @@ need to move furniture, you rent a van for that one job — you don't replace th
   set reserved concurrency to 10 per project once AWS approves the account's higher Lambda
   concurrency quota (requested; currently 10 for the whole account); run the
   first real idea through `/idea`.
-- **Security hygiene (owner actions):** delete the root access keys on the laptop; narrow the
-  unrelated `gha-sandbox` role's trust in the shared account.
+- **Security hygiene:** the laptop's root access keys were deleted (2026-10-15); narrowing the
+  unrelated `gha-sandbox`/`gha-prod` roles is prepared but deferred.
 - **Likely improvements:** SQS routing in `api-kit`; an outbox or DynamoDB Streams for reliable
   event publishing; a dead-letter queue for event delivery; a live-projects page on the apex
   (the `dr4w.io` homepage lives in a separate repo, `Dr4wOne/dr4w-landpage`).

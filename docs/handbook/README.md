@@ -49,7 +49,7 @@ reference docs (`docs/README.md`), and the handbook links to them instead of cop
 | # | Chapter | In one line |
 |---|---|---|
 | 12 | [The idea pipeline and AI workflow](12-idea-pipeline-and-ai.md) | Spec-driven development, the idea stages and slash commands, how Claude is used here (`CLAUDE.md`, `/start`, `/handoff`), and the caveman/ponytail house rules |
-| 13 | [Tutorials](13-tutorials.md) | **A.** Ship your first feature on `hello` (endpoint, UI, test, PR, plan, merge, verify, roll back). **B.** Launch a new project that runs on a schedule and consumes `hello`'s events |
+| 13 | [Tutorials](13-tutorials.md) · [B](13b-tutorial-new-project.md) | **A.** Ship your first feature on `hello` (endpoint, UI, test, PR, plan, merge, verify, roll back). **B.** Launch a new project that runs on a schedule and consumes `hello`'s events |
 
 ### Part V — Decisions and depth
 | # | Chapter | In one line |
