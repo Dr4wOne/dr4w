@@ -8,7 +8,7 @@ hub machine.
 ## Where things are
 | Thing | Where |
 |---|---|
-| Kit checkout | `~/workspace/dr4w-home` (the hub runs from `apps/hub`) |
+| Kit checkout | `~/workspace/dr4w-home-public`, a clone of the public repo (the hub runs from `apps/hub`) |
 | Config: devices, scenes, port | `~/.config/dr4w-home/config.json` (mode 0600) |
 | TV credentials (client key, certificate, pinned TV certificate, address) | `~/.config/dr4w-home/android-tv/<tv>/` (mode 0700, files 0600) |
 | Phone sign-in key | `~/.config/dr4w-home/hub-secret` |
@@ -18,7 +18,7 @@ hub machine.
 
 ## Switch over from the TV bridge (once)
 ```bash
-cp ~/workspace/dr4w-home/apps/hub/dr4w-home-hub.service ~/.config/systemd/user/
+cp ~/workspace/dr4w-home-public/apps/hub/dr4w-home-hub.service ~/.config/systemd/user/
 # edit WorkingDirectory if the checkout is not at ~/dr4w-home, and set ExecStart to the full
 # Node 24 path (`which node`): systemd does not load nvm
 systemctl --user stop tv-bridge && systemctl --user disable tv-bridge
