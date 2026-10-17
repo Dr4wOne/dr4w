@@ -1,6 +1,6 @@
 # Status
 
-**Last updated:** 2026-10-15 · as of `main` @ `baf72af` (+ branch `docs/memory-system`)
+**Last updated:** 2026-10-17 · as of branch `docs/home-hub` (PR #17)
 Update this file with `/handoff` at the end of every session.
 
 ## Live projects
@@ -8,6 +8,8 @@ Update this file with `/handoff` at the end of every session.
 |---|---|---|---|
 | hello | https://hello.dr4w.io | Notes CRUD; publishes `Note.Created.v1` | 2026-10-15 |
 | echo | https://echo.dr4w.io | Counts hello's `Note.Created.v1` events | 2026-10-15 |
+
+Outside this repo: **dr4w home**, the open-source home hub kit ([Dr4wOne/dr4w-home](https://github.com/Dr4wOne/dr4w-home), public since 2026-10-17; showcase in demo mode live at https://home.dr4w.io, deployed by that repo's CI). The owner's hub runs from it at home ([guides/my-home-hub.md](guides/my-home-hub.md), [ADR 0018](decisions/0018-home-hub-outside-the-monorepo.md)).
 
 Platform: `dr4w-bus` (+ 7-day archive), `dr4w-alerts` (email confirmed), `dr4w-monthly` budget ($10).
 
@@ -23,6 +25,8 @@ acceptance criteria: `docs/SPEC.md` §9. Dry run: `ideas/guestbook/` (idea → l
 1. **~2026-10-22:** check real idle cost in Cost Explorer (`docs/costs.md`); replace the estimate.
 2. When the Lambda quota reaches 1000 (AWS case open): set `reserved_concurrency = 10` in each `module "api"` (ADR 0009).
 3. First real idea through `/idea`.
+4. dr4w home Part B (Nintendo Switch 1 and 2) starts after Part A is approved; status lives in the kit's own `docs/STATUS.md`.
+5. Exclude `home.dr4w.io` and `blog.dr4w.io` from Cloudflare Web Analytics automatic setup: its injected beacon is blocked by their CSP and logs a console error.
 
 ## Known issues / gaps vs spec
 | Item | Impact | Where |

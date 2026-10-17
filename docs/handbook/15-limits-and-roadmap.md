@@ -76,3 +76,21 @@ Expected: the defaults behind several limits above — `50`, `100`, `10`, and `n
 `docs/STATUS.md` · `docs/decisions/README.md` · Lambda quotas: https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html ·
 API Gateway quotas: https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html ·
 back to the [Handbook contents](README.md)
+
+## Beyond the monorepo: dr4w home
+
+Not everything belongs on AWS. **dr4w home** controls devices in a home (a TV today, consoles next), so
+its server has to run *in* the home, next to the devices, and must never be reachable from the
+internet. It therefore lives in its own public repository,
+[Dr4wOne/dr4w-home](https://github.com/Dr4wOne/dr4w-home), and borrows only what fits from this one:
+TypeScript, Hono and zod at the boundary, Biome, the pinned `catalog:`, a static Cloudflare Worker for
+its demo at `home.dr4w.io`, and the same habits (decisions as ADRs, `docs/STATUS.md`, outside judges).
+
+| | A dr4w project | dr4w home |
+|---|---|---|
+| Runs on | Lambda + DynamoDB, behind a Worker | A computer at home (Node), plus a static demo Worker |
+| Reached through | `https://<name>.dr4w.io` | The home network, or a private VPN (Tailscale) when away |
+| Data | DynamoDB tables | A local config file with the owner's devices and scenes |
+| Extends by | New projects (`pnpm new`) | New device adapters (`pnpm device:new`) |
+
+Why it is separate, and why the old `tv` idea was dropped: [ADR 0018](../decisions/0018-home-hub-outside-the-monorepo.md).
