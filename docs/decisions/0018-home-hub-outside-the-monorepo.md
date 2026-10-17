@@ -17,7 +17,7 @@ private VPN (Tailscale), never a public endpoint. The `tv` app and its planned c
 
 ## Consequences
 - The monorepo keeps its rules for AWS projects; the kit follows them where they apply and records each
-  difference in its own `docs/dr4w-directives.md`.
+  difference in its own [dr4w-directives.md](https://github.com/Dr4wOne/dr4w-home/blob/main/docs/dr4w-directives.md).
 - `packages/android-tv-remote` and `apps/tv` exist only on `idea/tv`; the maintained code is the kit's
   `adapter-android-tv`.
 

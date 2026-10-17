@@ -28,7 +28,7 @@ Then sign the phone in again (the cookie changed): `pnpm hub link` in the kit ch
 code. **Rollback:** `systemctl --user disable --now dr4w-home-hub && systemctl --user enable --now tv-bridge`.
 
 ## Remote access
-Through Tailscale only (the kit's `docs/remote-access.md`): the hub machine renamed to a neutral name,
+Through Tailscale only (the kit's [remote-access.md](https://github.com/Dr4wOne/dr4w-home/blob/main/docs/remote-access.md)): the hub machine renamed to a neutral name,
 HTTPS certificates on, `sudo tailscale serve --bg 8790`, the iPhone app with VPN On Demand "Always",
 and the app added to the Home Screen from the `https://…ts.net` address. Set `DR4W_HOME_URL` in the
 service to that address so sign-in links use it. There is no public endpoint and no port forward.
@@ -40,7 +40,7 @@ TV).
 
 ## Rules for this hub
 - Never send a test command to the TV from cached state, and not while someone may be watching without
-  agreeing first (an incident on 2026-10-16 interrupted YouTube; see the kit's `docs/discovery.md`).
+  agreeing first (an incident on 2026-10-16 interrupted YouTube; see the kit's [discovery.md](https://github.com/Dr4wOne/dr4w-home/blob/main/docs/discovery.md)).
 - Anything recorded from the TV goes through the kit's `node scripts/privacy.ts scrub` before it enters
   any repository.
 - The `idea/tv` branch of this repo holds raw TV identifiers and must not be pushed; a local `pre-push`
