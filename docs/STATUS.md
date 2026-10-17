@@ -9,6 +9,8 @@ Update this file with `/handoff` at the end of every session.
 | hello | https://hello.dr4w.io | Notes CRUD; publishes `Note.Created.v1` | 2026-10-15 |
 | echo | https://echo.dr4w.io | Counts hello's `Note.Created.v1` events | 2026-10-15 |
 
+Outside this repo: **dr4w home**, the open-source home hub kit ([Dr4wOne/dr4w-home](https://github.com/Dr4wOne/dr4w-home), private until its gate G3; showcase planned at `home.dr4w.io`). The owner's hub runs from it at home ([guides/my-home-hub.md](guides/my-home-hub.md), [ADR 0018](decisions/0018-home-hub-outside-the-monorepo.md)).
+
 Platform: `dr4w-bus` (+ 7-day archive), `dr4w-alerts` (email confirmed), `dr4w-monthly` budget ($10).
 
 ## Milestones

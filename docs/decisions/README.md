@@ -21,5 +21,6 @@ One file per decision, newest at the bottom. Format: Context · Decision · Cons
 | 0015 | [Optional Postgres uses the RDS Data API](0015-postgres-via-data-api.md) | 2026-10-14 | Accepted |
 | 0016 | [Platform uses subdomains only](0016-subdomains-only.md) | 2026-10-14 | Accepted |
 | 0017 | [Caveman and ponytail plugins on by default](0017-caveman-and-ponytail-by-default.md) | 2026-10-15 | Accepted |
+| 0018 | [dr4w home lives outside the monorepo; the `tv` app is superseded](0018-home-hub-outside-the-monorepo.md) | 2026-10-17 | Accepted |
 
 New decision: copy the shape of any file, take the next number, link it from `docs/STATUS.md` → Recent decisions.
