@@ -28,6 +28,35 @@ curl -s http://127.0.0.1:8790/health
 Then sign the phone in again (the cookie changed): `pnpm hub link` in the kit checkout, scan the QR
 code. **Rollback:** `systemctl --user disable --now dr4w-home-hub && systemctl --user enable --now tv-bridge`.
 
+## Turning the hub on and off
+The hub is a systemd user service. It starts when you log in to the laptop and restarts by itself
+2 seconds after a crash.
+
+| To | Run |
+|---|---|
+| See if it runs | `systemctl --user status dr4w-home-hub` or `curl -s http://127.0.0.1:8790/health` |
+| Stop it for now | `systemctl --user stop dr4w-home-hub` (it comes back at the next login) |
+| Start it again | `systemctl --user start dr4w-home-hub` |
+| Restart (after `git pull` or a config change) | `systemctl --user restart dr4w-home-hub` |
+| Keep it off, also after reboots | `systemctl --user disable --now dr4w-home-hub` |
+| Turn it back on for good | `systemctl --user enable --now dr4w-home-hub` |
+
+**What happens when the laptop is off, asleep or the lid is closed.** The hub stops answering, and the
+phone app shows that the hub is not answering. It sends nothing, and nothing is queued. The TV
+itself keeps working with its normal remote. Nothing at home is exposed while the hub is down.
+
+**When the laptop comes back.** Tailscale starts with the system. The hub starts at your login, then
+reconnects to the TV within a few seconds and reads its state again before it accepts commands. The
+phone stays signed in, so you only reopen the app.
+
+**After a reboot, before anyone logs in, the hub is down.** User services start at login. To start
+the hub at boot without a login, run `loginctl enable-linger` once (undo:
+`loginctl disable-linger`).
+
+**For a hub that is always on,** run the kit on a small machine that never sleeps, such as a
+Raspberry Pi or a mini PC, and move `~/.config/dr4w-home/` to it. The TV needs no new pairing,
+because its keys travel in that folder.
+
 ## Remote access
 Through Tailscale only (the kit's [remote-access.md](https://github.com/Dr4wOne/dr4w-home/blob/main/docs/remote-access.md)): the hub machine renamed to a neutral name,
 HTTPS certificates on, `sudo tailscale serve --bg 8790`, the iPhone app with VPN On Demand "Always",
