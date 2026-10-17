@@ -4,7 +4,7 @@ A personal platform that takes an idea to a live product at `<name>.dr4w.io` wit
 Each project is a React app on a Cloudflare Worker that proxies `/api/*` to one Hono Lambda on AWS.
 One monorepo, shared infrastructure modules, and Claude slash commands for the idea → launch pipeline.
 
-**Live:** [hello.dr4w.io](https://hello.dr4w.io) (notes) · [echo.dr4w.io](https://echo.dr4w.io) (counts hello's notes) — current state in [docs/STATUS.md](docs/STATUS.md).
+**Live:** [hello.dr4w.io](https://hello.dr4w.io) (notes) · [echo.dr4w.io](https://echo.dr4w.io) (counts hello's notes) · [home.dr4w.io](https://home.dr4w.io) (the [dr4w home](https://github.com/Dr4wOne/dr4w-home) kit in demo mode) — current state in [docs/STATUS.md](docs/STATUS.md).
 
 ## Start here
 | If you want to… | Read, in this order |
