@@ -1,0 +1,563 @@
+/* Device figures (Fig. 02+). Drawn with CSS only; states are data attributes on the host
+   (see device.ts). Only transform, opacity and filter animate. Tokens: tokens.css. */
+dr4w-cannon,
+dr4w-tube {
+  position: relative;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: 0.75rem;
+  width: 100%;
+  height: 100%;
+}
+.dev-art {
+  position: relative;
+  min-height: 0;
+}
+.dev-art > div,
+.dev-art i,
+.dev-art div {
+  position: absolute;
+}
+.dev-parts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem;
+}
+.dev-btn {
+  min-height: 48px;
+  padding: 0 0.9rem;
+  border: 0;
+  border-left: 3px solid var(--gm-600);
+  background: var(--gm-800);
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--step-small);
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+  transition:
+    transform var(--dur-snap) var(--ease-snap),
+    border-color var(--dur-snap);
+}
+.dev-btn:active {
+  transform: translateY(2px);
+}
+.dev-btn[aria-pressed="true"] {
+  border-left-color: var(--glow-red-hot);
+}
+.dev-btn:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+}
+.dev-live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+/* ---------- Fig. 02 arm cannon (side view) ---------- */
+.cn {
+  inset: 0;
+  margin: auto;
+  width: 100%;
+  max-height: 100%;
+  aspect-ratio: 16 / 7;
+  transition: transform var(--dur-settle) var(--ease-settle);
+}
+.cn-mount {
+  left: 1%;
+  top: 28%;
+  width: 17%;
+  height: 44%;
+  background: linear-gradient(180deg, var(--gm-400), var(--gm-600) 25%, var(--gm-900));
+  clip-path: polygon(14% 0, 100% 0, 100% 100%, 14% 100%, 0 78%, 0 22%);
+}
+.cn-socket {
+  left: 18%;
+  top: 30%;
+  width: 22%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, var(--gm-400), var(--gm-800) 60%, var(--gm-900));
+}
+.cn-socket::after {
+  content: "";
+  position: absolute;
+  inset: 36%;
+  border-radius: 50%;
+  background: var(--glow-red);
+}
+.cn-barrel {
+  left: 15%;
+  top: 20%;
+  width: 67%;
+  height: 60%;
+  border-radius: 5% / 18%;
+  background: linear-gradient(
+    180deg,
+    var(--gm-200) 0,
+    var(--gm-400) 6%,
+    var(--gm-600) 22%,
+    var(--gm-800) 58%,
+    var(--gm-900)
+  );
+}
+.cn-coil {
+  left: 30%;
+  top: 22%;
+  width: 36%;
+  height: 56%;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--gm-900) 0 6%,
+    var(--glow-red-hot) 6% 10%,
+    var(--glow-red) 10% 16%
+  );
+  box-shadow: inset 0 0 0 3px var(--gm-900);
+  filter: brightness(0.75);
+}
+.cn-ring {
+  top: -5%;
+  width: 4%;
+  height: 110%;
+  background: linear-gradient(
+    180deg,
+    var(--gm-200),
+    var(--gm-400) 12%,
+    var(--gm-600) 40%,
+    var(--gm-900)
+  );
+}
+.cn-meter {
+  left: 40%;
+  bottom: 6%;
+  width: 22%;
+  height: 9%;
+  display: flex;
+  gap: 6%;
+}
+.cn-meter i {
+  position: static !important;
+  flex: 1;
+  background: var(--gm-900);
+  box-shadow: inset 0 0 0 1px var(--gm-600);
+}
+.cn-vents {
+  left: 44%;
+  top: 12%;
+  width: 20%;
+  height: 9%;
+  display: flex;
+  gap: 12%;
+}
+.cn-vents i {
+  position: static !important;
+  flex: 1;
+  background: var(--gm-600);
+  transform-origin: 0 100%;
+  transition: transform var(--dur-settle) var(--ease-settle);
+}
+.cn-steams {
+  left: 44%;
+  top: 0;
+  width: 20%;
+  height: 12%;
+}
+.cn-steams i {
+  top: 0;
+  width: 20%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--gm-400);
+  opacity: 0;
+}
+.cn-steams i:nth-child(1) {
+  left: 10%;
+}
+.cn-steams i:nth-child(2) {
+  left: 40%;
+}
+.cn-steams i:nth-child(3) {
+  left: 70%;
+}
+.cn-muzzle {
+  left: 79%;
+  top: 14%;
+  width: 13%;
+  height: 72%;
+  border-radius: 18% / 10%;
+  background: linear-gradient(
+    180deg,
+    var(--gm-200),
+    var(--gm-400) 10%,
+    var(--gm-600) 35%,
+    var(--gm-900)
+  );
+}
+.cn-hot {
+  left: 30%;
+  top: 28%;
+  width: 52%;
+  height: 44%;
+  border-radius: 50%;
+  background: var(--glow-red);
+  box-shadow:
+    0 0 0 4px var(--gm-900),
+    0 0 18px var(--glow-red);
+}
+.cn-flash {
+  left: 88%;
+  top: 22%;
+  width: 16%;
+  height: 56%;
+  background: var(--glow-red-hot);
+  clip-path: polygon(0 50%, 40% 30%, 100% 50%, 40% 70%);
+  opacity: 0;
+  transform-origin: 0 50%;
+}
+.cn-bolt {
+  left: 92%;
+  top: 44%;
+  width: 12%;
+  height: 12%;
+  border-radius: 40%;
+  background: var(--glow-red-hot);
+  box-shadow: 0 0 14px var(--glow-red);
+  opacity: 0;
+}
+.cn-laser {
+  left: 92%;
+  top: 49.5%;
+  width: 60%;
+  height: 1%;
+  background: var(--accent-cyan);
+  box-shadow: 0 0 8px var(--accent-cyan);
+  opacity: 0;
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  transition:
+    transform var(--dur-settle) var(--ease-snap),
+    opacity var(--dur-snap);
+}
+
+dr4w-cannon[data-charge="charging"] .cn-coil {
+  animation: dev-glow var(--dur-charge) var(--ease-charge) infinite;
+}
+dr4w-cannon[data-charge="charging"] .cn-hot {
+  animation: dev-glow calc(var(--dur-charge) / 2) var(--ease-charge) infinite;
+}
+dr4w-cannon[data-charge="charging"] .cn-meter i {
+  animation: dev-fill var(--dur-charge) steps(1) both;
+}
+dr4w-cannon[data-charge="charging"] .cn-meter i:nth-child(2) {
+  animation-delay: calc(var(--dur-charge) * 0.2);
+}
+dr4w-cannon[data-charge="charging"] .cn-meter i:nth-child(3) {
+  animation-delay: calc(var(--dur-charge) * 0.4);
+}
+dr4w-cannon[data-charge="charging"] .cn-meter i:nth-child(4) {
+  animation-delay: calc(var(--dur-charge) * 0.6);
+}
+dr4w-cannon[data-charge="charging"] .cn-meter i:nth-child(5) {
+  animation-delay: calc(var(--dur-charge) * 0.8);
+}
+dr4w-cannon[data-charge="charging"] .cn {
+  animation: dev-shake calc(var(--dur-snap) * 0.8) linear infinite;
+}
+dr4w-cannon[data-charge="fired"] .cn {
+  transform: translateX(-3%);
+}
+dr4w-cannon[data-charge="fired"] .cn-flash {
+  animation: dev-flash var(--dur-settle) var(--ease-snap);
+}
+dr4w-cannon[data-charge="fired"] .cn-bolt {
+  animation: dev-bolt var(--dur-settle) var(--ease-snap) both;
+}
+dr4w-cannon[data-vents="open"] .cn-vents i {
+  transform: rotate(-55deg);
+}
+dr4w-cannon[data-vents="open"] .cn-steams i {
+  animation: dev-steam calc(var(--dur-idle) / 2) ease-out infinite;
+}
+dr4w-cannon[data-vents="open"] .cn-steams i:nth-child(2) {
+  animation-delay: calc(var(--dur-idle) / 6);
+}
+dr4w-cannon[data-vents="open"] .cn-steams i:nth-child(3) {
+  animation-delay: calc(var(--dur-idle) / 3);
+}
+dr4w-cannon[data-vents="open"] .cn-coil {
+  filter: brightness(0.4);
+}
+dr4w-cannon[data-sight="scan"] .cn-laser {
+  opacity: 0.9;
+  transform: scaleX(1);
+  animation: dev-flicker var(--dur-idle) steps(1) infinite;
+}
+
+/* ---------- Fig. 08 stasis tube ---------- */
+.tb {
+  inset: 0;
+  margin: auto;
+  height: 100%;
+  max-width: 100%;
+  aspect-ratio: 3 / 4.4;
+}
+.tb-cap,
+.tb-base {
+  left: 14%;
+  width: 72%;
+  background: linear-gradient(
+    180deg,
+    var(--gm-400),
+    var(--gm-600) 20%,
+    var(--gm-800) 70%,
+    var(--gm-900)
+  );
+  clip-path: polygon(8% 0, 92% 0, 100% 100%, 0 100%);
+}
+.tb-cap {
+  top: 0;
+  height: 8%;
+  clip-path: polygon(0 0, 100% 0, 92% 100%, 8% 100%);
+}
+.tb-base {
+  top: 70%;
+  height: 11%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8%;
+}
+.tb-lamp {
+  position: static !important;
+  width: 6%;
+  height: 22%;
+  background: var(--glow-red);
+  box-shadow: 0 0 8px var(--glow-red);
+  transition: background var(--dur-settle);
+}
+.tb-inside {
+  left: 20%;
+  top: 8%;
+  width: 60%;
+  height: 62%;
+  overflow: hidden;
+  background: var(--bg-0, var(--ground));
+}
+.tb-unit {
+  left: 50%;
+  bottom: 2%;
+  height: 92%;
+  aspect-ratio: 438 / 588;
+  transform: translateX(-50%);
+  transition: transform var(--dur-settle) var(--ease-settle);
+}
+.tb-unit .fig {
+  --r-head: 16deg;
+  --r-arm-r-upper: 4deg;
+  --r-arm-l-upper: -4deg;
+  transition: --r-head var(--dur-settle) var(--ease-settle);
+}
+.tb-unit .eye {
+  opacity: 0.12;
+}
+.tb-fluid {
+  inset: 0;
+  background: rgb(64 208 240 / 0.26);
+  transform-origin: 50% 100%;
+  transition: transform calc(var(--dur-charge) * 3) var(--ease-charge);
+}
+.tb-bubble {
+  bottom: 0;
+  width: 4%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: rgb(64 208 240 / 0.6);
+  animation: dev-bubble calc(var(--dur-idle) * 0.9) linear infinite;
+}
+.tb-bubble:nth-child(1) {
+  left: 12%;
+}
+.tb-bubble:nth-child(2) {
+  left: 30%;
+  animation-delay: calc(var(--dur-idle) * -0.3);
+}
+.tb-bubble:nth-child(3) {
+  left: 55%;
+  animation-delay: calc(var(--dur-idle) * -0.6);
+}
+.tb-bubble:nth-child(4) {
+  left: 72%;
+  animation-delay: calc(var(--dur-idle) * -0.15);
+}
+.tb-bubble:nth-child(5) {
+  left: 88%;
+  animation-delay: calc(var(--dur-idle) * -0.45);
+}
+.tb-clamp {
+  top: 38%;
+  width: 26%;
+  height: 5%;
+  background: linear-gradient(180deg, var(--gm-400), var(--gm-800));
+  transition: transform var(--dur-settle) var(--ease-settle);
+}
+.tb-clamp-l {
+  left: 0;
+}
+.tb-clamp-r {
+  right: 0;
+}
+.tb-glass {
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgb(64 208 240 / 0.18) 0 4%,
+    transparent 4% 18%,
+    rgb(230 228 225 / 0.12) 18% 22%,
+    transparent 22% 86%,
+    rgb(64 208 240 / 0.18) 86%
+  );
+  box-shadow: inset 0 0 24px rgb(64 208 240 / 0.25);
+  transition: transform calc(var(--dur-settle) * 2) var(--ease-settle);
+}
+.tb-panel {
+  left: 6%;
+  top: 84%;
+  width: 88%;
+  height: 16%;
+  padding: 2% 4%;
+  background: var(--gm-900);
+  box-shadow: inset 0 0 0 2px var(--glow-red);
+  font-family: var(--font-hud, monospace);
+  font-size: var(--step-small);
+  line-height: 1.25;
+  color: var(--ink);
+}
+.tb-panel p {
+  margin: 0;
+}
+.tb-panel b {
+  font-weight: 400;
+  color: var(--glow-red-hot);
+}
+.tb-mission {
+  display: inline-block;
+  clip-path: inset(0 100% 0 0);
+}
+
+dr4w-tube[data-fluid="draining"] .tb-fluid {
+  transform: scaleY(0.35);
+}
+dr4w-tube[data-fluid="empty"] .tb-fluid {
+  transform: scaleY(0);
+}
+dr4w-tube:not([data-fluid="full"]) .tb-bubble {
+  animation: none;
+  opacity: 0;
+}
+dr4w-tube[data-clamps="released"] .tb-clamp-l {
+  transform: translateX(-100%);
+}
+dr4w-tube[data-clamps="released"] .tb-clamp-r {
+  transform: translateX(100%);
+}
+dr4w-tube[data-glass="open"] .tb-glass {
+  transform: translateY(-104%);
+}
+dr4w-tube[data-wake="waking"] .tb-unit .eye {
+  animation: dev-flicker calc(var(--dur-snap) * 6) steps(1) infinite;
+  opacity: 1;
+}
+dr4w-tube[data-wake="awake"] .tb-unit .eye {
+  opacity: 1;
+}
+dr4w-tube[data-wake="awake"] .tb-unit .fig {
+  --r-head: 0deg;
+  --r-arm-r-upper: 0deg;
+  --r-arm-l-upper: 0deg;
+}
+dr4w-tube[data-wake="awake"] .tb-unit {
+  transform: translateX(-50%) translateY(-2%);
+}
+dr4w-tube[data-wake="awake"] .tb-lamp {
+  background: var(--accent-cyan);
+  box-shadow: 0 0 8px var(--accent-cyan);
+}
+dr4w-tube[data-wake="awake"] .tb-mission {
+  animation: dev-type var(--dur-charge) steps(7) both;
+}
+
+@keyframes dev-glow {
+  50% {
+    filter: brightness(1.9);
+  }
+}
+@keyframes dev-fill {
+  to {
+    background: var(--glow-red-hot);
+  }
+}
+@keyframes dev-shake {
+  50% {
+    transform: translateX(0.4%);
+  }
+}
+@keyframes dev-flash {
+  20% {
+    opacity: 1;
+    transform: scaleX(1.4);
+  }
+}
+@keyframes dev-bolt {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(500%);
+  }
+}
+@keyframes dev-steam {
+  0% {
+    opacity: 0.6;
+    transform: translateY(0) scale(0.6);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-260%) scale(1.6);
+  }
+}
+@keyframes dev-flicker {
+  50% {
+    opacity: 0.35;
+  }
+}
+@keyframes dev-bubble {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-2400%);
+  }
+}
+@keyframes dev-type {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  dr4w-cannon *,
+  dr4w-tube * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

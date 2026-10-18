@@ -1,5 +1,5 @@
+import { Collection } from './Collection.tsx'
 import { type Art, band, chapters, facts, huntArt, introArt, lockedChapter } from './content.ts'
-import './figure/dr4w-figure.ts'
 
 function Picture({ art, eager }: { art: Art; eager?: boolean }) {
   return (
@@ -28,9 +28,7 @@ export function App() {
           </nav>
         </div>
         <h1 className="monument">DR4W</h1>
-        <div className="figure-slot">
-          <dr4w-figure />
-        </div>
+        <Collection />
         <div className="hero-foot">
           <p>
             The war ended. The hunt didn't.

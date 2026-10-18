@@ -1,6 +1,9 @@
 # concept
 
-<What this project does, for a user, in one or two sentences.>
+Teaser home for the game DR4W / All Iron Hunt: play with DR4W and his gear as CSS figures, then read
+the premise and the hunt.
+
+**Before launch:** remove `<meta name="robots" content="noindex">` from `web/index.html` when Daniel says "launch".
 
 **Live:** https://concept.dr4w.io · **Status:** see `project.json` · **Agent notes:** `CLAUDE.md`
 

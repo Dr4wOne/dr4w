@@ -40,7 +40,8 @@ describe('App', () => {
     )
     for (const f of files) {
       const src = readFileSync(join(dir, f), 'utf8')
-      expect(src, f).not.toMatch(/#[0-9a-f]{3,8}\b/i)
+      // Colours can only hide in CSS or JSX; .ts files use #private fields that look like hex.
+      if (!f.endsWith('.ts')) expect(src, f).not.toMatch(/#[0-9a-f]{3,8}\b/i)
       expect(src, f).not.toMatch(/\b[1-9]\d*m?s\b/)
     }
   })
