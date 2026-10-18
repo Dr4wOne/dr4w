@@ -1,0 +1,388 @@
+@import "./tokens.css";
+
+* {
+  box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font: 400 var(--step-body) / 1.45 var(--font);
+}
+a {
+  color: inherit;
+}
+img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+:focus-visible {
+  outline: 3px solid var(--signal);
+  outline-offset: 3px;
+}
+h2 {
+  font-size: var(--step-head);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin: 0;
+}
+section {
+  padding: 0 var(--margin);
+  margin-top: var(--section-gap);
+}
+.soft {
+  font-size: var(--step-small);
+  color: var(--ink-soft);
+  font-weight: 400;
+}
+
+/* Hero: the name as a monument, the figure in front of it */
+.hero {
+  position: relative;
+  min-height: 100svh;
+  overflow: hidden;
+}
+.bar {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 3;
+  display: flex;
+  justify-content: space-between;
+  padding: var(--margin);
+  font-weight: 500;
+}
+.bar a {
+  text-decoration: none;
+}
+.bar nav a {
+  margin-left: 1rem;
+}
+.monument {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  padding-top: 3.5rem;
+  text-align: center;
+  font-size: var(--step-monument);
+  font-weight: 500;
+  letter-spacing: -0.05em;
+  line-height: 0.85;
+}
+.figure-slot {
+  position: relative;
+  z-index: 2;
+  height: min(80svh, 120vw);
+  aspect-ratio: 548 / 628;
+  margin: calc(var(--step-monument) * -0.45) auto 0;
+}
+.hero-foot {
+  position: absolute;
+  inset: auto 0 var(--margin);
+  z-index: 3;
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 1rem;
+  padding: 0 var(--margin);
+}
+.hero-foot p {
+  margin: 0;
+  max-width: 28ch;
+  font-weight: 500;
+}
+.btn {
+  display: inline-block;
+  min-height: 44px;
+  padding: 0.85rem 1.2rem;
+  background: var(--signal);
+  color: var(--ground);
+  font-weight: 500;
+  text-decoration: none;
+  transition: background var(--dur-snap) var(--ease-snap);
+}
+.btn:hover {
+  background: var(--ink);
+}
+
+/* Premise: title, note, facts row */
+.intro-row {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  align-items: end;
+  gap: 1rem;
+}
+.intro-row h2 {
+  grid-column: 1 / 7;
+}
+.intro-row p {
+  grid-column: 9 / 13;
+  margin: 0;
+}
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2rem;
+  margin: 7rem 0 0;
+}
+.facts dt {
+  font-size: var(--step-lead);
+  line-height: 1.1;
+}
+.facts dd {
+  margin: 0.2rem 0 0;
+  font-size: var(--step-small);
+  color: var(--ink-soft);
+}
+
+/* Hunt: the story page beside the giant word and the bars */
+.hunt-wrap {
+  display: grid;
+  grid-template-columns: 1fr minmax(0, 600px);
+  gap: clamp(2rem, 5vw, 6rem);
+  align-items: start;
+}
+.hunt-art {
+  position: sticky;
+  top: var(--margin);
+  margin: 0 0 0 calc(var(--margin) * -1);
+}
+.hunt {
+  container-type: inline-size;
+}
+figure {
+  margin: 0;
+}
+figcaption {
+  margin-top: 10px;
+  font-size: var(--step-small);
+  color: var(--ink-soft);
+}
+.wide {
+  margin: 6rem calc(var(--margin) * -1) 0;
+}
+.wide img {
+  max-height: 90svh;
+}
+.giant {
+  margin-bottom: 1.25rem;
+  font-size: 38cqw;
+  letter-spacing: -0.05em;
+  line-height: 0.8;
+  text-transform: uppercase;
+}
+details {
+  margin-bottom: 6px;
+  background: var(--plate-1);
+}
+summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 56px;
+  padding: 0 18px;
+  font-weight: 500;
+  cursor: pointer;
+  list-style: none;
+}
+summary::-webkit-details-marker {
+  display: none;
+}
+summary::after {
+  content: "+";
+  color: var(--signal);
+  font-size: 1.4rem;
+}
+details[open] summary::after {
+  content: "–";
+}
+details > div {
+  padding: 0 18px 20px;
+}
+details p {
+  margin: 0.25rem 0;
+}
+.boss {
+  font-weight: 500;
+}
+.locked summary {
+  color: var(--ink-soft);
+}
+
+/* Art: band of unequal panels */
+.showcase h2 {
+  margin: 0 0 4rem 16.6%;
+}
+.band {
+  display: flex;
+  height: 68svh;
+  margin-inline: calc(var(--margin) * -1);
+}
+.band > div {
+  overflow: hidden;
+  transition: flex-grow var(--dur-settle) var(--ease-snap);
+}
+.band > div:nth-child(1) {
+  flex: 5 1 0;
+}
+.band > div:nth-child(2) {
+  flex: 2 1 0;
+}
+.band > div:nth-child(3) {
+  flex: 3 1 0;
+}
+.band > div:nth-child(4) {
+  flex: 2 1 0;
+}
+.band > div:hover {
+  flex-grow: 6;
+}
+.caption {
+  margin-top: 0.6rem;
+  font-size: var(--step-small);
+  color: var(--ink-soft);
+}
+
+/* Argos: one statement before the Listen band */
+.argos {
+  max-width: 24ch;
+  margin: var(--section-gap) var(--margin) 0;
+  font-size: var(--step-lead);
+}
+.argos p {
+  margin: 0;
+}
+.argos cite {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: var(--step-small);
+  font-style: normal;
+  color: var(--ink-soft);
+}
+
+/* Listen: the whole band is the link */
+.cta {
+  position: relative;
+  display: block;
+  min-height: 60svh;
+  margin-top: var(--section-gap);
+  padding: var(--margin);
+  background: var(--signal-deep);
+  color: var(--ink);
+  text-decoration: none;
+}
+.cta:hover,
+.cta:focus-visible {
+  background: var(--ink);
+  color: var(--signal-deep);
+}
+.cta-word {
+  position: absolute;
+  left: var(--margin);
+  bottom: 24px;
+  font-size: clamp(5rem, 26vw, 24rem);
+  font-weight: 500;
+  letter-spacing: -0.06em;
+  line-height: 0.8;
+}
+
+/* Footer: the name returns, inverted */
+footer {
+  overflow: hidden;
+  padding: var(--margin);
+  background: var(--ink);
+  color: var(--ground);
+}
+footer .row {
+  display: flex;
+  justify-content: space-between;
+  margin: 4rem 0 2rem;
+  font-size: var(--step-small);
+}
+footer .name {
+  margin-bottom: -0.12em;
+  font-size: var(--step-monument);
+  font-weight: 500;
+  letter-spacing: -0.05em;
+  line-height: 0.8;
+}
+
+@media (max-width: 640px) {
+  .figure-slot {
+    height: min(62svh, 118vw);
+  }
+  .hero-foot {
+    flex-direction: column;
+    align-items: start;
+  }
+  .intro-row {
+    display: block;
+  }
+  .intro-row p {
+    margin-top: 1rem;
+  }
+  .facts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    row-gap: 2rem;
+    margin-top: 4rem;
+  }
+  .showcase h2 {
+    margin: 0 0 2rem;
+  }
+  .band {
+    flex-wrap: wrap;
+    height: 84svh;
+  }
+  .band > div {
+    height: 50%;
+  }
+  .band > div:nth-child(1),
+  .band > div:nth-child(4) {
+    flex-basis: 64%;
+  }
+  .band > div:nth-child(2),
+  .band > div:nth-child(3) {
+    flex-basis: 36%;
+  }
+  .hunt-wrap {
+    display: block;
+  }
+  .hunt-art {
+    position: static;
+    margin: 0 calc(var(--margin) * -1) 3rem;
+  }
+}
+
+/* Entrances: each part rises in as it scrolls into view. Without support, it is simply there. */
+@supports (animation-timeline: view()) {
+  section :is(h2, p, dt, details, figure, .band > div),
+  .argos,
+  .cta-word {
+    animation: rise linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 60%;
+  }
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  * {
+    transition-duration: 0ms !important;
+    animation: none !important;
+  }
+}
