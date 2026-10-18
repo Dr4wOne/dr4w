@@ -1,7 +1,10 @@
+import './pixel/pixel-tokens.css'
+import './pixel/pieces/cannon-long.generated.css'
 import './devices.css'
 import { DeviceFigure, type Part } from './device.ts'
 
-/** Fig. 02: the arm cannon, side view. Hold to charge, release to fire; vents and the sight cycle. */
+/** Fig. 02: the arm cannon (Daniel's pixel piece from the sheet's weapon system). Hold to charge,
+ * release to fire; vents and the sight cycle. Effects are overlays; charging recolours the glow tokens. */
 export class Dr4wCannon extends DeviceFigure {
   name = 'Arm cannon'
   parts: readonly Part[] = [
@@ -22,17 +25,11 @@ export class Dr4wCannon extends DeviceFigure {
   ]
   drawing = `
     <div class="cn">
-      <div class="cn-mount"><i class="cn-socket"></i></div>
-      <div class="cn-barrel">
-        <i class="cn-coil"></i>
-        <i class="cn-ring" style="left:14%"></i><i class="cn-ring" style="left:20%"></i>
-        <i class="cn-ring" style="left:70%"></i><i class="cn-ring" style="left:76%"></i>
-        <div class="cn-meter">${'<i></i>'.repeat(5)}</div>
-      </div>
+      <div class="cn-art"><div class="pc-cannon-long"></div></div>
       <div class="cn-vents">${'<i></i>'.repeat(3)}</div>
-      <div class="cn-muzzle"><i class="cn-hot"></i></div>
-      <i class="cn-flash"></i><i class="cn-bolt"></i><i class="cn-laser"></i>
       <div class="cn-steams">${'<i></i>'.repeat(3)}</div>
+      <i class="cn-flash"></i><i class="cn-bolt"></i><i class="cn-laser"></i>
+      <div class="cn-meter">${'<i></i>'.repeat(5)}</div>
     </div>`
 }
 

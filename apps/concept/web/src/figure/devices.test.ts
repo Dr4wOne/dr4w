@@ -60,6 +60,6 @@ describe('device figures', () => {
     expect(el.querySelector('.tb-panel')?.textContent).toMatch(
       /UNIT: DR4W.*HUNT PROTOCOL: ACTIVE.*MISSION: SURVIVE/s,
     )
-    expect(el.querySelectorAll('.tb-unit .j').length).toBeGreaterThan(10)
+    expect(el.querySelectorAll('.tb-unit .dr4w .g').length).toBe(10)
   })
 })

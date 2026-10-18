@@ -2,35 +2,55 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { render, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it, vi } from 'vitest'
 import { App } from './App.tsx'
 
+// jsdom has no IntersectionObserver or matchMedia; the page only needs them for motion.
+beforeAll(() => {
+  vi.stubGlobal(
+    'IntersectionObserver',
+    class {
+      observe() {}
+      disconnect() {}
+    },
+  )
+  vi.stubGlobal('matchMedia', () => ({ matches: true }))
+})
+
 describe('App', () => {
-  it('shows the name as the page heading', () => {
+  it('shows the title lockup as the page heading', () => {
     render(<App />)
-    expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('DR4W')
+    expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('DR4WIRON HUNT')
   })
 
-  it('lists five chapters and keeps the fifth locked', () => {
+  it('lists five stages and keeps the fifth a tease', () => {
     const { container } = render(<App />)
-    const summaries = [...container.querySelectorAll('summary')].map((s) => s.textContent)
-    expect(summaries).toEqual([
+    const names = [...container.querySelectorAll('.node-name')].map((n) => n.textContent)
+    expect(names).toEqual([
       'Solar Scrap Yard',
       'Dead Signal Tower',
       'Purge Core',
       'Memory Archive',
       'The Crown',
     ])
-    const locked = container.querySelector('details.locked')
-    expect(locked?.querySelector('.boss')).toBeNull()
     expect(container.textContent).not.toMatch(/Crown Engine/)
   })
 
   it('has every anchor the links point to', () => {
     const { container } = render(<App />)
-    for (const id of ['top', 'premise', 'hunt', 'art']) {
+    for (const id of ['main', 'figures', 'story', 'hunt', 'bosses', 'spec', 'archive']) {
       expect(container.querySelector(`#${id}`), id).not.toBeNull()
     }
+  })
+
+  it('gives the antenna no special call to action (D4)', () => {
+    const { container } = render(<App />)
+    expect(container.textContent).not.toMatch(/Tune the antenna|Listen/)
+  })
+
+  it('shows no Portuguese HUD text (D3)', () => {
+    const { container } = render(<App />)
+    expect(container.textContent).not.toMatch(/UNIDADE|PROTOCOLO|MISSÃO|FUNÇÃO|OBEDECER|ESCOLHA/)
   })
 
   it('keeps colours and durations in tokens.css only', () => {

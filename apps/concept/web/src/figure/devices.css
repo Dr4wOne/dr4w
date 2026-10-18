@@ -13,9 +13,7 @@ dr4w-tube {
   position: relative;
   min-height: 0;
 }
-.dev-art > div,
-.dev-art i,
-.dev-art div {
+:where(.dev-art) :where(div, i) {
   position: absolute;
 }
 .dev-parts {
@@ -58,113 +56,61 @@ dr4w-tube {
   clip-path: inset(50%);
 }
 
-/* ---------- Fig. 02 arm cannon (side view) ---------- */
+/* ---------- Fig. 02 arm cannon: the pixel piece + effect overlays (% of the piece box) ---------- */
+dr4w-cannon .dev-art {
+  display: grid;
+  place-items: center;
+  container-type: inline-size;
+}
+.cn,
+.cn-art {
+  position: relative;
+}
+.cn-art {
+  zoom: 3;
+}
+@container (min-width: 440px) {
+  .cn-art {
+    zoom: 4;
+  }
+}
+@container (min-width: 560px) {
+  .cn-art {
+    zoom: 5;
+  }
+}
+@container (min-width: 680px) {
+  .cn-art {
+    zoom: 6;
+  }
+}
 .cn {
-  inset: 0;
-  margin: auto;
-  width: 100%;
-  max-height: 100%;
-  aspect-ratio: 16 / 7;
   transition: transform var(--dur-settle) var(--ease-settle);
 }
-.cn-mount {
-  left: 1%;
-  top: 28%;
-  width: 17%;
-  height: 44%;
-  background: linear-gradient(180deg, var(--gm-400), var(--gm-600) 25%, var(--gm-900));
-  clip-path: polygon(14% 0, 100% 0, 100% 100%, 14% 100%, 0 78%, 0 22%);
-}
-.cn-socket {
-  left: 18%;
-  top: 30%;
-  width: 22%;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, var(--gm-400), var(--gm-800) 60%, var(--gm-900));
-}
-.cn-socket::after {
-  content: "";
-  position: absolute;
-  inset: 36%;
-  border-radius: 50%;
-  background: var(--glow-red);
-}
-.cn-barrel {
-  left: 15%;
-  top: 20%;
-  width: 67%;
-  height: 60%;
-  border-radius: 5% / 18%;
-  background: linear-gradient(
-    180deg,
-    var(--gm-200) 0,
-    var(--gm-400) 6%,
-    var(--gm-600) 22%,
-    var(--gm-800) 58%,
-    var(--gm-900)
-  );
-}
-.cn-coil {
-  left: 30%;
-  top: 22%;
-  width: 36%;
-  height: 56%;
-  background: repeating-linear-gradient(
-    90deg,
-    var(--gm-900) 0 6%,
-    var(--glow-red-hot) 6% 10%,
-    var(--glow-red) 10% 16%
-  );
-  box-shadow: inset 0 0 0 3px var(--gm-900);
-  filter: brightness(0.75);
-}
-.cn-ring {
-  top: -5%;
-  width: 4%;
-  height: 110%;
-  background: linear-gradient(
-    180deg,
-    var(--gm-200),
-    var(--gm-400) 12%,
-    var(--gm-600) 40%,
-    var(--gm-900)
-  );
-}
-.cn-meter {
-  left: 40%;
-  bottom: 6%;
-  width: 22%;
-  height: 9%;
-  display: flex;
-  gap: 6%;
-}
-.cn-meter i {
-  position: static !important;
-  flex: 1;
-  background: var(--gm-900);
-  box-shadow: inset 0 0 0 1px var(--gm-600);
-}
 .cn-vents {
-  left: 44%;
-  top: 12%;
-  width: 20%;
+  left: 46%;
+  top: 4%;
+  width: 22%;
   height: 9%;
   display: flex;
-  gap: 12%;
+  gap: 14%;
+}
+.cn-vents i,
+.cn-meter i {
+  position: static;
+  flex: 1;
 }
 .cn-vents i {
-  position: static !important;
-  flex: 1;
-  background: var(--gm-600);
+  background: var(--m4);
+  box-shadow: inset 0 1px 0 var(--m9);
   transform-origin: 0 100%;
   transition: transform var(--dur-settle) var(--ease-settle);
 }
 .cn-steams {
-  left: 44%;
-  top: 0;
-  width: 20%;
-  height: 12%;
+  left: 46%;
+  top: -10%;
+  width: 22%;
+  height: 14%;
 }
 .cn-steams i {
   top: 0;
@@ -183,71 +129,54 @@ dr4w-tube {
 .cn-steams i:nth-child(3) {
   left: 70%;
 }
-.cn-muzzle {
-  left: 79%;
-  top: 14%;
-  width: 13%;
-  height: 72%;
-  border-radius: 18% / 10%;
-  background: linear-gradient(
-    180deg,
-    var(--gm-200),
-    var(--gm-400) 10%,
-    var(--gm-600) 35%,
-    var(--gm-900)
-  );
-}
-.cn-hot {
+.cn-meter {
   left: 30%;
-  top: 28%;
-  width: 52%;
-  height: 44%;
-  border-radius: 50%;
-  background: var(--glow-red);
-  box-shadow:
-    0 0 0 4px var(--gm-900),
-    0 0 18px var(--glow-red);
+  bottom: -16%;
+  width: 34%;
+  height: 7%;
+  display: flex;
+  gap: 6%;
+}
+.cn-meter i {
+  background: var(--gm-900);
+  box-shadow: inset 0 0 0 1px var(--gm-600);
 }
 .cn-flash {
-  left: 88%;
-  top: 22%;
-  width: 16%;
-  height: 56%;
-  background: var(--glow-red-hot);
-  clip-path: polygon(0 50%, 40% 30%, 100% 50%, 40% 70%);
+  right: 91%;
+  top: 50%;
+  width: 18%;
+  height: 32%;
+  background: var(--hot-b3);
+  clip-path: polygon(100% 50%, 60% 20%, 0 50%, 60% 80%);
   opacity: 0;
-  transform-origin: 0 50%;
+  transform-origin: 100% 50%;
 }
 .cn-bolt {
-  left: 92%;
-  top: 44%;
-  width: 12%;
+  left: 0;
+  top: 60%;
+  width: 10%;
   height: 12%;
   border-radius: 40%;
-  background: var(--glow-red-hot);
-  box-shadow: 0 0 14px var(--glow-red);
+  background: var(--hot-a4);
+  box-shadow: 0 0 14px var(--hot-a4);
   opacity: 0;
 }
 .cn-laser {
-  left: 92%;
-  top: 49.5%;
-  width: 60%;
-  height: 1%;
+  right: 92%;
+  top: 65%;
+  width: 70%;
+  height: 1.5%;
   background: var(--accent-cyan);
   box-shadow: 0 0 8px var(--accent-cyan);
   opacity: 0;
-  transform-origin: 0 50%;
+  transform-origin: 100% 50%;
   transform: scaleX(0);
   transition:
     transform var(--dur-settle) var(--ease-snap),
     opacity var(--dur-snap);
 }
-
-dr4w-cannon[data-charge="charging"] .cn-coil {
-  animation: dev-glow var(--dur-charge) var(--ease-charge) infinite;
-}
-dr4w-cannon[data-charge="charging"] .cn-hot {
-  animation: dev-glow calc(var(--dur-charge) / 2) var(--ease-charge) infinite;
+dr4w-cannon[data-charge="charging"] .cn-art {
+  animation: charge calc(var(--dur-idle) / 7.1) steps(3) infinite;
 }
 dr4w-cannon[data-charge="charging"] .cn-meter i {
   animation: dev-fill var(--dur-charge) steps(1) both;
@@ -268,13 +197,19 @@ dr4w-cannon[data-charge="charging"] .cn {
   animation: dev-shake calc(var(--dur-snap) * 0.8) linear infinite;
 }
 dr4w-cannon[data-charge="fired"] .cn {
-  transform: translateX(-3%);
+  transform: translateX(2%);
 }
 dr4w-cannon[data-charge="fired"] .cn-flash {
   animation: dev-flash var(--dur-settle) var(--ease-snap);
 }
 dr4w-cannon[data-charge="fired"] .cn-bolt {
   animation: dev-bolt var(--dur-settle) var(--ease-snap) both;
+}
+dr4w-cannon[data-charge="fired"] .cn-art {
+  --g2: var(--cool2);
+  --g3: var(--cool3);
+  --g4: var(--cool4);
+  --g5: var(--cool5);
 }
 dr4w-cannon[data-vents="open"] .cn-vents i {
   transform: rotate(-55deg);
@@ -287,9 +222,6 @@ dr4w-cannon[data-vents="open"] .cn-steams i:nth-child(2) {
 }
 dr4w-cannon[data-vents="open"] .cn-steams i:nth-child(3) {
   animation-delay: calc(var(--dur-idle) / 3);
-}
-dr4w-cannon[data-vents="open"] .cn-coil {
-  filter: brightness(0.4);
 }
 dr4w-cannon[data-sight="scan"] .cn-laser {
   opacity: 0.9;
@@ -340,6 +272,7 @@ dr4w-cannon[data-sight="scan"] .cn-laser {
   transition: background var(--dur-settle);
 }
 .tb-inside {
+  container: tube / size;
   left: 20%;
   top: 8%;
   width: 60%;
@@ -349,20 +282,29 @@ dr4w-cannon[data-sight="scan"] .cn-laser {
 }
 .tb-unit {
   left: 50%;
-  bottom: 2%;
-  height: 92%;
-  aspect-ratio: 438 / 588;
+  bottom: 1%;
   transform: translateX(-50%);
   transition: transform var(--dur-settle) var(--ease-settle);
 }
-.tb-unit .fig {
-  --r-head: 16deg;
-  --r-arm-r-upper: 4deg;
-  --r-arm-l-upper: -4deg;
-  transition: --r-head var(--dur-settle) var(--ease-settle);
+.tb-unit .rig-zoom {
+  position: relative;
+  zoom: 1;
 }
-.tb-unit .eye {
-  opacity: 0.12;
+@container tube (min-height: 400px) {
+  .tb-unit .rig-zoom {
+    zoom: 2;
+  }
+}
+/* Asleep: head down, eyes and lights dark. */
+.tb-unit .g-head {
+  rotate: 14deg;
+  --g0: var(--dk0);
+  --g1: var(--dk1);
+  --g2: var(--dk2);
+  --g3: var(--dk3);
+  --g4: var(--dk4);
+  --g5: var(--dk5);
+  transition: rotate var(--dur-settle) var(--ease-settle);
 }
 .tb-fluid {
   inset: 0;
@@ -467,17 +409,17 @@ dr4w-tube[data-clamps="released"] .tb-clamp-r {
 dr4w-tube[data-glass="open"] .tb-glass {
   transform: translateY(-104%);
 }
-dr4w-tube[data-wake="waking"] .tb-unit .eye {
-  animation: dev-flicker calc(var(--dur-snap) * 6) steps(1) infinite;
-  opacity: 1;
+dr4w-tube[data-wake="waking"] .tb-unit .g-head {
+  animation: wake calc(var(--dur-snap) * 6) steps(1) infinite;
 }
-dr4w-tube[data-wake="awake"] .tb-unit .eye {
-  opacity: 1;
-}
-dr4w-tube[data-wake="awake"] .tb-unit .fig {
-  --r-head: 0deg;
-  --r-arm-r-upper: 0deg;
-  --r-arm-l-upper: 0deg;
+dr4w-tube[data-wake="awake"] .tb-unit .g-head {
+  rotate: 0deg;
+  --g0: initial;
+  --g1: initial;
+  --g2: initial;
+  --g3: initial;
+  --g4: initial;
+  --g5: initial;
 }
 dr4w-tube[data-wake="awake"] .tb-unit {
   transform: translateX(-50%) translateY(-2%);
@@ -490,6 +432,13 @@ dr4w-tube[data-wake="awake"] .tb-mission {
   animation: dev-type var(--dur-charge) steps(7) both;
 }
 
+@keyframes wake {
+  50% {
+    --g2: var(--hot-a4);
+    --g4: var(--hot-b3);
+    --g5: var(--hot-c5);
+  }
+}
 @keyframes dev-glow {
   50% {
     filter: brightness(1.9);
@@ -497,7 +446,7 @@ dr4w-tube[data-wake="awake"] .tb-mission {
 }
 @keyframes dev-fill {
   to {
-    background: var(--glow-red-hot);
+    background: var(--hot-a4);
   }
 }
 @keyframes dev-shake {
@@ -518,7 +467,7 @@ dr4w-tube[data-wake="awake"] .tb-mission {
   }
   100% {
     opacity: 0;
-    transform: translateX(500%);
+    transform: translateX(-600%);
   }
 }
 @keyframes dev-steam {

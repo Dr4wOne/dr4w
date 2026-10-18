@@ -1,377 +1,397 @@
-/* DR4W rig: poses and states. Joint angles are typed custom properties so keyframes can
-   interpolate them; each joint wrapper in rig.generated.css rotates by var(--r-<joint>).
-   Frame counts and timing: v2 rig spec (pixel sheet, 8 fps base). Only transform/opacity/filter move. */
-@property --r-torso {
-  syntax: "<angle>";
-  inherits: true;
-  initial-value: 0deg;
-}
-@property --r-head {
-  syntax: "<angle>";
-  inherits: true;
-  initial-value: 0deg;
-}
-@property --r-antenna {
-  syntax: "<angle>";
-  inherits: true;
-  initial-value: 0deg;
-}
-@property --r-arm-r-upper {
-  syntax: "<angle>";
-  inherits: true;
-  initial-value: 0deg;
-}
-@property --r-cannon {
-  syntax: "<angle>";
-  inherits: true;
-  initial-value: 0deg;
-}
-@property --r-arm-l-upper {
-  syntax: "<angle>";
-  inherits: true;
-  initial-value: 0deg;
-}
-@property --r-arm-l-fore {
-  syntax: "<angle>";
-  inherits: true;
-  initial-value: 0deg;
-}
-@property --r-blade {
-  syntax: "<angle>";
-  inherits: true;
-  initial-value: 0deg;
-}
-@property --r-leg-r-thigh {
-  syntax: "<angle>";
-  inherits: true;
-  initial-value: 0deg;
-}
-@property --r-leg-r-shin {
-  syntax: "<angle>";
-  inherits: true;
-  initial-value: 0deg;
-}
-@property --r-leg-l-thigh {
-  syntax: "<angle>";
-  inherits: true;
-  initial-value: 0deg;
-}
-@property --r-leg-l-shin {
-  syntax: "<angle>";
-  inherits: true;
-  initial-value: 0deg;
-}
-@property --lift {
-  syntax: "<percentage>";
-  inherits: true;
-  initial-value: 0%;
-}
-@property --squash {
-  syntax: "<number>";
-  inherits: true;
-  initial-value: 1;
-}
+/* DR4W pixel rig: states and motion. The pixels and pivots are generated (pixel/*.generated.css);
+   this file is hand-written, merged from Daniel's states.css (actions: aim, slash, heat, visor, core,
+   antenna, exploded view) and the agent's body states (walk, run, dash, jump/fall/land, charge,
+   shoot, hurt, turn). JS only flips data attributes. Timing in sprite frames (8 fps base). */
+@import "./pixel/pixel-tokens.css";
+@import "./pixel/rig.generated.css";
+@import "./pixel/parts.generated.css";
 
 dr4w-rig {
   position: relative;
   display: block;
   width: 100%;
   height: 100%;
-  --frame: calc(var(--dur-idle) / 25.6); /* one sprite frame at 8 fps */
+  --frame: calc(var(--dur-idle) / 25.6);
 }
 .rig-stage {
   position: relative;
   height: 100%;
-  outline-offset: 4px;
+  overflow: hidden;
   touch-action: manipulation;
 }
 .rig-stage:focus-visible {
   outline: 2px solid var(--accent-cyan);
+  outline-offset: -2px;
 }
 .rig-floor {
   position: absolute;
-  inset: auto 4% 2% 4%;
-  height: 2%;
-  background: var(--gm-800);
-  clip-path: polygon(3% 0, 97% 0, 100% 100%, 0 100%);
+  left: 8%;
+  right: 8%;
+  bottom: 9%;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(rgb(0 0 0 / 0.7), transparent 70%);
 }
+/* Outer box moves (page px); inner box zooms by a whole number so the pixels stay crisp. */
 .rig-body {
+  will-change: transform;
   position: absolute;
-  bottom: 3%;
   left: 50%;
-  height: 94%;
-  aspect-ratio: 438 / 588;
-  transform: translateX(calc(-50% + var(--x, 0px)));
+  bottom: 10%;
+  transform: translateX(calc(-50% + var(--x, 0px))) scaleX(var(--face, 1));
+  transform-origin: 50% 100%;
 }
-.rig-body .fig {
-  transform: translateY(var(--lift)) scaleX(var(--face, 1)) scaleY(var(--squash));
-  transform-origin: 55% 98%;
-}
-
-/* --- states --- */
-.fig[data-state="idle"] {
-  animation: rig-idle calc(var(--frame) * 8) ease-in-out infinite;
-}
-.fig[data-state="walk"] {
-  animation: rig-walk calc(var(--frame) * 6) linear infinite;
-}
-.fig[data-state="run"] {
-  animation: rig-run calc(var(--frame) * 4.5) linear infinite;
-}
-.fig[data-state="dash"] {
-  animation: rig-dash calc(var(--frame) * 3) var(--ease-snap) both;
-  filter: drop-shadow(calc(-1 * var(--dir, 1) * 18px) 0 0 rgb(160 40 29 / 0.45))
-    drop-shadow(calc(-1 * var(--dir, 1) * 36px) 0 0 rgb(160 40 29 / 0.2));
-}
-.fig[data-state="jump"] {
-  animation: rig-jump calc(var(--frame) * 3) var(--ease-snap) both;
-}
-.fig[data-state="fall"] {
-  animation: rig-fall calc(var(--frame) * 2) ease-in both;
-}
-.fig[data-state="land"] {
-  animation: rig-land calc(var(--frame) * 2) var(--ease-settle) both;
-}
-.fig[data-state="charge"] {
-  animation:
-    rig-aim calc(var(--frame) * 2) var(--ease-snap) both,
-    rig-shake calc(var(--frame) * 0.8) linear infinite;
-}
-.fig[data-state="shoot"] {
-  animation: rig-shoot calc(var(--frame) * 3) var(--ease-settle) both;
-}
-.fig[data-state="hurt"] {
-  animation: rig-hurt calc(var(--frame) * 2) linear both;
-}
-.fig[data-state="turn"] {
-  animation: rig-turn calc(var(--frame) * 2) var(--ease-snap) both;
+.rig-zoom {
+  zoom: var(--zoom, 2);
 }
 
-.fig[data-state="charge"] .coils,
-.fig[data-state="charge"] .bloom {
-  animation: rig-glow calc(var(--frame) * 2) var(--ease-charge) infinite;
+/* ---------- glow ramps (swap by scope) ---------- */
+[data-visor="cyan"] {
+  --g0: var(--cy0);
+  --g1: var(--cy1);
+  --g2: var(--cy2);
+  --g3: var(--cy3);
+  --g4: var(--cy4);
+  --g5: var(--cy5);
 }
-.fig[data-state="charge"] .bloom {
-  scale: 1.6;
+.dr4w .g-head[data-blink] {
+  --g0: var(--dk0);
+  --g1: var(--dk1);
+  --g2: var(--dk2);
+  --g3: var(--dk3);
+  --g4: var(--dk4);
+  --g5: var(--dk5);
 }
-.fig[data-state="shoot"] .bolt {
-  animation: rig-bolt calc(var(--frame) * 3) var(--ease-snap) both;
+.dr4w .g-cannon[data-charge="1"] {
+  animation: charge calc(var(--frame) * 3.6) steps(3) infinite;
 }
-.fig[data-charged] .bolt {
-  scale: 1.8;
+.dr4w .g-cannon[data-charge="cool"] {
+  --g2: var(--cool2);
+  --g3: var(--cool3);
+  --g4: var(--cool4);
+  --g5: var(--cool5);
+  transition:
+    --g2 var(--dur-charge),
+    --g3 var(--dur-charge),
+    --g4 var(--dur-charge),
+    --g5 var(--dur-charge);
 }
-.bolt {
+@keyframes charge {
+  0% {
+    --g2: var(--hot-a2);
+    --g3: var(--hot-a3);
+    --g4: var(--hot-a4);
+    --g5: var(--hot-a5);
+    translate: 0 0;
+  }
+  50% {
+    --g2: var(--hot-b2);
+    --g3: var(--hot-b3);
+    --g4: var(--hot-b4);
+    --g5: var(--hot-b5);
+    translate: 0.5px 0;
+  }
+  100% {
+    --g2: var(--hot-c2);
+    --g3: var(--hot-c3);
+    --g4: var(--hot-c4);
+    --g5: var(--hot-c5);
+    translate: 0 0.5px;
+  }
+}
+.dr4w .g-blade[data-heat="1"] {
+  --g2: var(--heat2);
+  --g3: var(--heat3);
+  --g4: var(--heat4);
+  --g5: var(--heat5);
+  filter: drop-shadow(0 0 2px var(--hot-a4));
+}
+.dr4w .g-blade[data-heat="0"] {
+  --g2: var(--cold2);
+  --g3: var(--cold3);
+  --g4: var(--cold4);
+  --g5: var(--cold5);
+}
+.dr4w .g-torso[data-core="pulse"] > .px {
+  animation: core calc(var(--frame) * 8.8) steps(4) infinite;
+}
+@keyframes core {
+  50% {
+    --g2: var(--hot-a4);
+    --g4: var(--hot-b3);
+    --g5: var(--hot-c5);
+  }
+}
+
+/* ---------- part motions ---------- */
+/* Each part is thousands of box-shadows: its own layer lets rotations composite instead of repaint. */
+.dr4w .g {
+  will-change: transform, rotate, translate;
+  transition:
+    transform calc(var(--frame) * 1.44) var(--ease-settle),
+    translate calc(var(--frame) * 3.2) var(--ease-snap);
+}
+.dr4w .g-antenna[data-ext="0"] {
+  transform: scaleY(0.25);
+}
+.dr4w .g-arm_cannon[data-aim="1"] {
+  transform: rotate(48deg);
+}
+.dr4w .g-arm_cannon[data-aim="1"] .g-cannon {
+  transform: rotate(6deg);
+}
+.dr4w .g-cannon[data-recoil] {
+  animation: recoil calc(var(--frame) * 1.76) steps(2);
+}
+@keyframes recoil {
+  40% {
+    translate: 2px -2.6px;
+  }
+}
+.dr4w .g-arm_blade[data-swing] {
+  animation: swing calc(var(--frame) * 4.4) steps(5);
+}
+@keyframes swing {
+  30% {
+    transform: rotate(-38deg);
+  }
+  55% {
+    transform: rotate(14deg);
+  }
+  100% {
+    transform: rotate(0);
+  }
+}
+/* beam: inside the cannon group so it follows the arm */
+.dr4w .beam {
+  position: absolute;
+  left: 6px;
+  top: 128px;
+  width: 160px;
+  height: 3px;
+  transform-origin: 0 50%;
+  rotate: 126.8deg;
+  scale: 0 1;
   opacity: 0;
-  background: var(--glow-red-hot);
-  border-radius: 40%;
-  box-shadow: 0 0 10px var(--glow-red);
+  background: linear-gradient(90deg, var(--ink), var(--hot-b3) 20%, var(--hot-a4) 60%, transparent);
+  filter: drop-shadow(0 0 2px var(--hot-a4));
 }
-.fig[data-state="hurt"] .eye {
-  background: var(--accent-cyan);
+.dr4w .g-cannon[data-recoil] .beam {
+  animation: beam calc(var(--frame) * 2.4) steps(4) forwards;
 }
-
-@keyframes rig-idle {
-  50% {
-    --lift: 0.5%;
-    --r-head: -2deg;
-    --r-arm-r-upper: 2deg;
-    --r-arm-l-upper: -2deg;
-  }
+.dr4w[data-charged] .beam {
+  height: 6px;
+  top: 126px;
 }
-@keyframes rig-walk {
-  0%,
-  100% {
-    --r-leg-r-thigh: 7deg;
-    --r-leg-r-shin: -4deg;
-    --r-leg-l-thigh: -3deg;
-    --r-leg-l-shin: 12deg;
-    --r-arm-l-upper: 6deg;
-    --r-arm-r-upper: -4deg;
-    --lift: 0%;
-  }
-  25% {
-    --lift: -1%;
-  }
-  50% {
-    --r-leg-r-thigh: 3deg;
-    --r-leg-r-shin: -12deg;
-    --r-leg-l-thigh: -7deg;
-    --r-leg-l-shin: 4deg;
-    --r-arm-l-upper: -6deg;
-    --r-arm-r-upper: 4deg;
-    --lift: 0%;
-  }
-  75% {
-    --lift: -1%;
-  }
-}
-@keyframes rig-run {
-  0%,
-  100% {
-    --r-torso: 3deg;
-    --r-leg-r-thigh: 14deg;
-    --r-leg-r-shin: -6deg;
-    --r-leg-l-thigh: -6deg;
-    --r-leg-l-shin: 26deg;
-    --r-arm-l-upper: 18deg;
-    --r-arm-l-fore: 20deg;
-    --r-arm-r-upper: -12deg;
-    --lift: 0%;
-  }
-  25% {
-    --lift: -2.5%;
-  }
-  50% {
-    --r-torso: 3deg;
-    --r-leg-r-thigh: 6deg;
-    --r-leg-r-shin: -26deg;
-    --r-leg-l-thigh: -14deg;
-    --r-leg-l-shin: 6deg;
-    --r-arm-l-upper: -18deg;
-    --r-arm-l-fore: 10deg;
-    --r-arm-r-upper: 12deg;
-    --lift: 0%;
-  }
-  75% {
-    --lift: -2.5%;
-  }
-}
-@keyframes rig-dash {
+@keyframes beam {
   0% {
-    --r-torso: 0deg;
-  }
-  30%,
-  70% {
-    --r-torso: 8deg;
-    --r-leg-r-thigh: 18deg;
-    --r-leg-l-thigh: -22deg;
-    --r-leg-l-shin: 30deg;
-    --r-arm-l-upper: -30deg;
-    --r-arm-r-upper: 20deg;
-    --lift: -1%;
-  }
-}
-@keyframes rig-jump {
-  0% {
-    --squash: 0.94;
-    --lift: 1%;
+    scale: 0 1;
+    opacity: 1;
   }
   40% {
-    --squash: 1.04;
-  }
-  100% {
-    --lift: -18%;
-    --squash: 1;
-    --r-leg-r-thigh: 16deg;
-    --r-leg-r-shin: -38deg;
-    --r-leg-l-thigh: -16deg;
-    --r-leg-l-shin: 38deg;
-    --r-arm-l-upper: -24deg;
-    --r-arm-r-upper: 18deg;
-  }
-}
-@keyframes rig-fall {
-  from {
-    --lift: -18%;
-    --r-leg-r-thigh: 8deg;
-    --r-leg-l-thigh: -8deg;
-    --r-arm-l-upper: -30deg;
-    --r-arm-r-upper: 24deg;
-  }
-  to {
-    --lift: 0%;
-    --r-leg-r-thigh: 4deg;
-    --r-leg-l-thigh: -4deg;
-    --r-arm-l-upper: -14deg;
-    --r-arm-r-upper: 10deg;
-  }
-}
-@keyframes rig-land {
-  30% {
-    --squash: 0.92;
-    --lift: 1.5%;
-    --r-leg-r-shin: -14deg;
-    --r-leg-l-shin: 14deg;
-  }
-}
-@keyframes rig-aim {
-  to {
-    --r-arm-r-upper: 42deg;
-    --r-cannon: 18deg;
-    --r-torso: -3deg;
-    --r-head: -4deg;
-  }
-}
-@keyframes rig-shoot {
-  from {
-    --r-arm-r-upper: 42deg;
-    --r-cannon: 18deg;
-    --r-torso: -3deg;
-  }
-  20% {
-    --r-arm-r-upper: 50deg;
-    --r-cannon: 24deg;
-    --r-torso: -6deg;
-  }
-  to {
-    --r-arm-r-upper: 0deg;
-    --r-cannon: 0deg;
-    --r-torso: 0deg;
-  }
-}
-@keyframes rig-hurt {
-  0%,
-  100% {
-    --r-torso: 0deg;
-    filter: none;
-  }
-  20% {
-    --r-torso: -9deg;
-    --r-head: -12deg;
-    filter: brightness(2.2);
-  }
-  50% {
-    --r-torso: 6deg;
-    filter: none;
-  }
-  70% {
-    --r-torso: -4deg;
-    filter: brightness(1.6);
-  }
-}
-@keyframes rig-turn {
-  50% {
-    --squash: 0.96;
-  }
-}
-@keyframes rig-shake {
-  50% {
-    --lift: 0.3%;
-  }
-}
-@keyframes rig-glow {
-  50% {
-    filter: brightness(1.8);
-  }
-}
-@keyframes rig-bolt {
-  0% {
+    scale: 1 1.6;
     opacity: 1;
-    transform: rotate(119.7deg) translateX(0);
   }
   100% {
+    scale: 1 0;
     opacity: 0;
-    transform: rotate(119.7deg) translateX(1400%);
   }
 }
 
-/* on-screen controls (touch and mouse) */
+/* ---------- body states ---------- */
+.dr4w {
+  transform-origin: 50% 100%;
+}
+.dr4w[data-state="idle"] .g-torso {
+  animation: bob calc(var(--frame) * 11.2) steps(2) infinite;
+}
+@keyframes bob {
+  50% {
+    translate: 0 1px;
+  }
+}
+.dr4w[data-state="walk"] .g-leg_l,
+.dr4w[data-state="run"] .g-leg_l {
+  animation: leg-a calc(var(--frame) * 4.8) steps(4) infinite;
+}
+.dr4w[data-state="walk"] .g-leg_r,
+.dr4w[data-state="run"] .g-leg_r,
+.dr4w[data-state="walk"] .g-arm_blade,
+.dr4w[data-state="run"] .g-arm_blade {
+  animation: leg-a calc(var(--frame) * 4.8) steps(4) infinite reverse;
+}
+.dr4w[data-state="walk"] .g-pelvis,
+.dr4w[data-state="run"] .g-pelvis {
+  animation: bob calc(var(--frame) * 2.4) steps(2) infinite;
+}
+.dr4w[data-state="run"] .g-leg_l,
+.dr4w[data-state="run"] .g-leg_r,
+.dr4w[data-state="run"] .g-arm_blade {
+  animation-name: leg-b;
+  animation-duration: calc(var(--frame) * 3.2);
+}
+.dr4w[data-state="run"] .g-torso {
+  rotate: 4deg;
+}
+@keyframes leg-a {
+  0%,
+  100% {
+    rotate: 7deg;
+  }
+  50% {
+    rotate: -7deg;
+  }
+}
+@keyframes leg-b {
+  0%,
+  100% {
+    rotate: 13deg;
+  }
+  50% {
+    rotate: -13deg;
+  }
+}
+.dr4w[data-state="dash"] {
+  animation: dash calc(var(--frame) * 3) var(--ease-snap) both;
+  filter: drop-shadow(calc(-6px * var(--dir, 1)) 0 0 rgb(160 40 29 / 0.5))
+    drop-shadow(calc(-12px * var(--dir, 1)) 0 0 rgb(160 40 29 / 0.25));
+}
+@keyframes dash {
+  30%,
+  70% {
+    scale: 1.04 0.96;
+  }
+}
+.dr4w[data-state="dash"] .g-torso {
+  rotate: 7deg;
+}
+.dr4w[data-state="jump"] {
+  animation: jump calc(var(--frame) * 3) var(--ease-snap) both;
+}
+.dr4w[data-state="fall"] {
+  animation: fall calc(var(--frame) * 2) ease-in both;
+}
+.dr4w[data-state="land"] {
+  animation: land calc(var(--frame) * 2) var(--ease-settle) both;
+}
+@keyframes jump {
+  0% {
+    translate: 0 0;
+    scale: 1;
+  }
+  20% {
+    translate: 0 4px;
+    scale: 1.03 0.95;
+  }
+  100% {
+    translate: 0 -34px;
+    scale: 0.98 1.03;
+  }
+}
+@keyframes fall {
+  from {
+    translate: 0 -34px;
+  }
+  to {
+    translate: 0 0;
+  }
+}
+@keyframes land {
+  40% {
+    translate: 0 2px;
+    scale: 1.03 0.96;
+  }
+}
+.dr4w[data-state="charge"] .g-arm_cannon,
+.dr4w[data-state="shoot"] .g-arm_cannon {
+  transform: rotate(48deg);
+}
+.dr4w[data-state="charge"] .g-cannon,
+.dr4w[data-state="shoot"] .g-cannon {
+  transform: rotate(6deg);
+}
+.dr4w[data-state="hurt"] {
+  animation: hurt calc(var(--frame) * 3.6) steps(6);
+}
+@keyframes hurt {
+  0%,
+  40% {
+    filter: brightness(3) saturate(0);
+  }
+  20% {
+    translate: -3px 0;
+  }
+  60% {
+    translate: 3px 0;
+    filter: none;
+  }
+  80% {
+    translate: -2px 0;
+  }
+}
+.dr4w[data-state="turn"] {
+  animation: turn calc(var(--frame) * 2) var(--ease-snap);
+}
+@keyframes turn {
+  50% {
+    scale: 0.94 1;
+  }
+}
+
+/* ---------- exploded view: shows the separation ---------- */
+.dr4w[data-explode] .g-head {
+  translate: 0 -14px;
+}
+.dr4w[data-explode] .g-antenna {
+  translate: 0 -9px;
+}
+.dr4w[data-explode] .g-arm_cannon {
+  translate: -14px -4px;
+}
+.dr4w[data-explode] .g-cannon {
+  translate: -10px 10px;
+}
+.dr4w[data-explode] .g-arm_blade {
+  translate: 16px -4px;
+}
+.dr4w[data-explode] .g-blade {
+  translate: 10px 12px;
+}
+.dr4w[data-explode] .g-leg_l {
+  translate: -10px 16px;
+}
+.dr4w[data-explode] .g-leg_r {
+  translate: 10px 16px;
+}
+.dr4w[data-explode] .g-pelvis > .px,
+.dr4w[data-explode] .g-pelvis > .hs {
+  translate: 0 8px;
+}
+
+/* ---------- hotspots: real buttons that follow their part ---------- */
+.dr4w .hs {
+  position: absolute;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.dr4w .hs:hover,
+.dr4w .hs:focus-visible,
+.dr4w[data-explode] .hs {
+  outline: 0.5px dashed var(--accent-cyan);
+  outline-offset: 0.5px;
+}
+
+/* ---------- on-screen pad (touch and mouse) ---------- */
 .rig-pad {
   position: absolute;
-  inset: auto 0 0 0;
+  inset: auto 0 0;
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
-  gap: 0.4rem;
+  gap: 0.35rem;
   padding: 0.4rem;
 }
 .rig-pad button {
@@ -407,9 +427,10 @@ dr4w-rig {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  dr4w-rig .fig,
-  dr4w-rig .fig * {
+  .dr4w,
+  .dr4w * {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

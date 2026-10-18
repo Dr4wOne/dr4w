@@ -1,6 +1,7 @@
 import './devices.css'
 import { DeviceFigure, type Part } from './device.ts'
-import { RIG_HTML } from './rig.generated.ts'
+import { rigMarkup } from './pixel/rig-markup.ts'
+import './rig.css'
 
 /** Fig. 08: the stasis tube, the tomb where DR4W wakes in chapter 1. Drain, release, open, wake. */
 export class Dr4wTube extends DeviceFigure {
@@ -30,7 +31,7 @@ export class Dr4wTube extends DeviceFigure {
     <div class="tb">
       <div class="tb-cap"></div>
       <div class="tb-inside">
-        <div class="tb-unit"><div class="fig">${RIG_HTML}</div></div>
+        <div class="tb-unit"><div class="rig-zoom">${rigMarkup(false)}</div></div>
         <div class="tb-fluid">${'<i class="tb-bubble"></i>'.repeat(5)}</div>
         <i class="tb-clamp tb-clamp-l"></i><i class="tb-clamp tb-clamp-r"></i>
         <div class="tb-glass"></div>

@@ -4,7 +4,8 @@ import type { Dr4wRig, RigState } from './dr4w-rig.ts'
 import './dr4w-rig.ts'
 
 let rig: Dr4wRig
-const fig = () => rig.querySelector('.fig') as HTMLElement
+const fig = () => rig.querySelector('.dr4w') as HTMLElement
+const g = (id: string) => rig.querySelector(`.g-${id}`) as HTMLElement
 // jsdom has no styles, so every frame length is 0 ms: one tick finishes a one-shot.
 const tick = () => vi.advanceTimersByTime(20)
 
@@ -14,6 +15,7 @@ beforeEach(() => {
     setTimeout(() => cb(performance.now()), 16),
   )
   vi.stubGlobal('cancelAnimationFrame', (id: number) => clearTimeout(id))
+  vi.stubGlobal('matchMedia', () => ({ matches: true }))
   rig = document.createElement('dr4w-rig') as Dr4wRig
   document.body.append(rig)
 })
@@ -24,8 +26,9 @@ afterEach(() => {
 })
 
 describe('<dr4w-rig>', () => {
-  it('builds the rig, the stage and a labelled pad', () => {
-    expect(rig.querySelectorAll('.j').length).toBeGreaterThan(10)
+  it('builds the ten-part pixel rig, a part button each, and a labelled pad', () => {
+    expect(rig.querySelectorAll('.dr4w .g').length).toBe(10)
+    expect(rig.querySelectorAll('.dr4w .hs').length).toBe(10)
     expect(rig.querySelector('.rig-stage')?.getAttribute('tabindex')).toBe('0')
     const labels = [...rig.querySelectorAll('.rig-pad button')].map((b) =>
       b.getAttribute('aria-label'),
@@ -36,15 +39,16 @@ describe('<dr4w-rig>', () => {
       'Jump',
       'Dash',
       'Shoot, hold to charge',
-      'Take a hit',
+      'Slash',
+      'Separate the parts',
     ])
     expect(fig().dataset.state).toBe('idle')
   })
 
-  it('reaches all eleven states', () => {
+  it('reaches all eleven body states', () => {
     const seen = new Set<RigState>([rig.state])
     rig.addEventListener('rigstate', (e) => seen.add((e as CustomEvent).detail.state))
-    rig.press('right', true) // walk, then run once held (0 ms threshold in jsdom)
+    rig.press('right', true) // walk, then run once held
     tick()
     rig.press('right', false)
     tick()
@@ -82,7 +86,7 @@ describe('<dr4w-rig>', () => {
   it('mirrors the figure when it turns', () => {
     rig.press('left', true)
     expect(rig.state).toBe('turn')
-    expect(fig().style.getPropertyValue('--face')).toBe('-1')
+    expect((rig.querySelector('.rig-body') as HTMLElement).style.transform).toContain('scaleX(-1)')
   })
 
   it('lands back in idle after a jump', () => {
@@ -96,21 +100,42 @@ describe('<dr4w-rig>', () => {
     expect(rig.state).toBe('idle')
   })
 
-  it('marks a held shot as charged and announces it', () => {
+  it('charges the cannon while held, fires a charged shot, then cools it', () => {
     rig.press('shoot', true)
     expect(rig.state).toBe('charge')
+    expect(g('cannon').dataset.charge).toBe('1')
     rig.press('shoot', false)
     expect(rig.state).toBe('shoot')
+    expect(g('cannon').dataset.charge).toBe('cool')
     expect(fig().hasAttribute('data-charged')).toBe(true) // 0 ms charge time in jsdom
     expect(rig.querySelector('.rig-live')?.textContent).toBe('Charged shot.')
   })
 
-  it('maps keys only while the stage has focus, and lets go on blur', () => {
+  it('runs the part actions: visor, heat, core, aim, antenna, parts, slash', () => {
+    for (const k of ['visor', 'heat', 'core', 'aim', 'antenna', 'explode', 'slash'])
+      rig.press(k, true)
+    expect(g('head').dataset.visor).toBe('cyan')
+    expect(g('blade').dataset.heat).toBe('0')
+    expect(g('torso').dataset.core).toBe('pulse')
+    expect(g('arm_cannon').dataset.aim).toBe('1')
+    expect(g('antenna').dataset.ext).toBe('0')
+    expect(fig().hasAttribute('data-explode')).toBe(true)
+    expect(g('arm_blade').hasAttribute('data-swing')).toBe(true)
+  })
+
+  it('makes every part a button that does what the part does', () => {
+    ;(rig.querySelector('.hs-head') as HTMLButtonElement).click()
+    expect(g('head').dataset.visor).toBe('cyan')
+    ;(rig.querySelector('.hs-pelvis') as HTMLButtonElement).click()
+    expect(rig.state).toBe('jump')
+  })
+
+  it('maps keys only while the stage has focus, and lets go when focus leaves', () => {
     const stage = rig.querySelector('.rig-stage') as HTMLElement
     stage.focus()
     stage.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }))
     expect(['walk', 'run']).toContain(rig.state)
-    stage.dispatchEvent(new FocusEvent('blur'))
+    stage.dispatchEvent(new FocusEvent('focusout', { bubbles: true }))
     expect(rig.state).toBe('idle')
   })
 })

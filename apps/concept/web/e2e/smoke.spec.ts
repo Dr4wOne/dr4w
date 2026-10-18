@@ -8,17 +8,15 @@ test('API is healthy through the Worker', async ({ request }) => {
   expect(await res.json()).toMatchObject({ ok: true })
 })
 
-test('the app renders', async ({ page }) => {
+test('the app renders the title lockup', async ({ page }) => {
   await page.goto('/')
-  await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('DR4WIRON HUNT')
 })
 
-test('the antenna can be operated', async ({ page }) => {
+test('DR4W can be played from the on-screen pad', async ({ page }) => {
   await page.goto('/')
-  const antenna = page.locator('#gear-antenna')
-  await antenna.click()
-  await expect(antenna).toHaveAttribute('aria-pressed', 'true')
-  await expect(page.locator('.d4-live')).toContainText('Antenna: listening')
+  await page.getByRole('button', { name: 'Jump', exact: true }).click()
+  await expect(page.locator('dr4w-rig .dr4w')).toHaveAttribute('data-state', /jump|fall|land/)
 })
 
 test('direct execute-api calls without the origin secret are rejected', async ({ request }) => {

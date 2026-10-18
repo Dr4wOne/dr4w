@@ -13,8 +13,10 @@ export const FIGURES = [
     code: 'D-4RW-020',
     line: 'Built to hunt people. Chose to hunt the hunt.',
     controls:
-      'Select the room, then ← → to move (hold to run), Space to jump, Shift to dash, X to shoot (hold to charge).',
-    chapter: 'Every chapter',
+      'Select the room, then ← → to move (hold to run), Space to jump, Shift to dash, F to shoot (hold to charge). S slash, H heat, V visor, C core, E parts.',
+    touch:
+      'Use the pad under him, or tap a part: head for the visor, chest for the core, blade for heat, cannon to fire.',
+    chapter: 'Playable in every chapter',
     tag: 'dr4w-rig',
   },
   {
@@ -23,6 +25,8 @@ export const FIGURES = [
     code: 'FOREARM WEAPON',
     line: 'His right forearm. Charges on the network’s own signal.',
     controls:
+      'Hold “Charge and fire”, then let go. Open the vents to bleed heat. Switch the sight on.',
+    touch:
       'Hold “Charge and fire”, then let go. Open the vents to bleed heat. Switch the sight on.',
     chapter: 'From chapter 1',
     tag: 'dr4w-cannon',
@@ -33,6 +37,7 @@ export const FIGURES = [
     code: 'THE TOMB',
     line: 'Where he wakes, years after the war, to a voice on the radio.',
     controls: 'Drain the fluid, release the clamps, open the glass, wake him.',
+    touch: 'Drain the fluid, release the clamps, open the glass, wake him.',
     chapter: 'Chapter 1',
     tag: 'dr4w-tube',
   },
@@ -109,13 +114,14 @@ export function Collection() {
           )
         })}
       </div>
-      <aside className="fig-card" aria-live="polite">
+      <div className="fig-card" aria-live="polite">
         <p className="fig-code">{fig.code}</p>
         <h2>{fig.name}</h2>
         <p>{fig.line}</p>
-        <p className="fig-controls">{fig.controls}</p>
+        <p className="fig-controls keys">{fig.controls}</p>
+        <p className="fig-controls touch">{fig.touch}</p>
         <p className="fig-chapter">{fig.chapter}</p>
-      </aside>
+      </div>
     </section>
   )
 }
