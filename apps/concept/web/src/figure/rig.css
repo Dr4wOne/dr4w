@@ -43,7 +43,27 @@ dr4w-rig {
   transform-origin: 50% 100%;
 }
 .rig-zoom {
-  zoom: var(--zoom, 2);
+  zoom: 1;
+}
+/* Largest whole-number zoom that fits (figure 142×197 CSS px, 95% of the height, 95% of the width):
+   set in CSS so it is right on the first frame (no layout shift) and the pixels stay crisp. */
+.rig-stage {
+  container-type: size;
+}
+@container (min-height: 415px) and (min-width: 300px) {
+  .rig-zoom {
+    zoom: 2;
+  }
+}
+@container (min-height: 622px) and (min-width: 450px) {
+  .rig-zoom {
+    zoom: 3;
+  }
+}
+@container (min-height: 830px) and (min-width: 600px) {
+  .rig-zoom {
+    zoom: 4;
+  }
 }
 
 /* ---------- glow ramps (swap by scope) ---------- */

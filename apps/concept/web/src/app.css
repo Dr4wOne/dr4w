@@ -1267,7 +1267,7 @@ body::after {
   }
   .fig-stage {
     order: -1;
-    height: 58svh;
+    height: 64svh;
   }
   .fig-index ol {
     display: grid;
@@ -1305,6 +1305,19 @@ body::after {
   }
 }
 @media (max-width: 640px) {
+  .hero-head {
+    gap: 0.6rem;
+    padding-top: 0.8rem;
+  }
+  .hero-head .lk-dr4w {
+    font-size: 3.4rem;
+  }
+  .hero-head .lk-skull {
+    display: none;
+  }
+  .press {
+    padding: 0.5rem 1.2rem;
+  }
   .moon {
     right: -8%;
     top: 1%;

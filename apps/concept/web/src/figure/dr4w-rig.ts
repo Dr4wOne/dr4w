@@ -3,7 +3,7 @@ import { type RigPart, rigMarkup } from './pixel/rig-markup.ts'
 
 /**
  * <dr4w-rig>: Fig. 01, DR4W as a playable pixel-CSS rig (Daniel's dr4w-css parts). JS only flips data
- * attributes and sets --x / --face / --zoom; every motion lives in rig.css. Keys act while the stage
+ * attributes and the body transform; every motion lives in rig.css. Keys act while the stage
  * has focus, so the page keeps its scroll keys (D25): ← → move (hold to run), Space/↑ jump, Shift dash,
  * F/J shoot (hold to charge), X hit, S slash, H blade heat, V visor, C core, R aim, A antenna, E parts.
  * Every part is also a button. Event: `rigstate` { state }.
@@ -32,8 +32,6 @@ const FRAMES: Partial<Record<RigState, number>> = {
   hurt: 4,
 }
 const RUN_AFTER = 4 // frames held before a walk becomes a run
-const FIG_W = 142 // generated figure box, CSS px (rig.generated.css)
-const FIG_H = 197
 const KEYS: Record<string, string> = {
   ArrowLeft: 'left',
   ArrowRight: 'right',
@@ -92,7 +90,6 @@ export class Dr4wRig extends HTMLElement {
   #last = 0
   #dashUntil = 0
   #blink = 0
-  #resize?: ResizeObserver
   #pulses = new Map<string, number>() // one running timer per part + attribute
 
   connectedCallback() {
@@ -147,19 +144,6 @@ export class Dr4wRig extends HTMLElement {
         if (e.key === 'Enter' || e.key === ' ') up()
       })
     }
-    // Whole-number zoom keeps every box-shadow pixel crisp.
-    if (typeof ResizeObserver !== 'undefined') {
-      this.#resize = new ResizeObserver(([e]) => {
-        const r = e?.contentRect
-        if (!r) return
-        const z = Math.max(
-          1,
-          Math.min(5, Math.floor(Math.min((r.height * 0.82) / FIG_H, (r.width * 0.9) / FIG_W))),
-        )
-        this.#body.style.setProperty('--zoom', String(z))
-      })
-      this.#resize.observe(stage)
-    }
     // Idle life: an occasional blink.
     if (!matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
       this.#blink = window.setInterval(
@@ -173,7 +157,6 @@ export class Dr4wRig extends HTMLElement {
     cancelAnimationFrame(this.#raf)
     clearTimeout(this.#busy)
     clearInterval(this.#blink)
-    this.#resize?.disconnect()
   }
 
   /** Drive the rig: `down` true on press, false on release (keyboard, pad, parts and tests use this). */
