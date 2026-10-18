@@ -104,3 +104,10 @@ test('no Portuguese and no antenna call to action on the page (D3, D4)', async (
   expect(text).not.toMatch(/UNIDADE|PROTOCOLO|MISSÃO|FUNÇÃO|OBEDECER|ESCOLHA|CAÇAR/)
   expect(text).not.toMatch(/Tune the antenna|Listen/)
 })
+
+test('the Spec section loads its pixel pieces when scrolled near', async ({ page }) => {
+  await page.goto('/#spec')
+  await expect(page.locator('#spec')).toHaveAttribute('data-ready', 'true')
+  const box = await page.locator('.pc-head-front').boundingBox()
+  expect(box && box.width > 50 && box.height > 50).toBe(true)
+})

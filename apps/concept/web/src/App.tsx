@@ -106,6 +106,12 @@ export function App() {
   const dialog = useRef<HTMLDialogElement>(null)
   const ch = chapters[stage] ?? chapters[0]
 
+  // The page renders after the browser's own jump to #section, so do the jump once it exists.
+  useEffect(() => {
+    const id = location.hash.slice(1)
+    if (id && !id.startsWith('fig-')) document.getElementById(id)?.scrollIntoView()
+  }, [])
+
   useEffect(() => {
     if (zoom) dialog.current?.showModal?.()
     else dialog.current?.close?.()

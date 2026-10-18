@@ -561,13 +561,6 @@ body::after {
   font-size: var(--step-small);
   color: var(--ink-soft);
 }
-.collection .rig-body {
-  height: 84%;
-  bottom: 13%;
-}
-.collection .rig-floor {
-  bottom: 11%;
-}
 .collection .rig-pad button,
 .collection .dev-btn {
   font-family: var(--font-hud);

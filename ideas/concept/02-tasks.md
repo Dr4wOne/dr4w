@@ -1,6 +1,6 @@
 ---
 title: Teaser home for DR4W / All Iron Hunt with a playable DR4W figure
-status: planned
+status: live
 project: concept
 created: 2026-10-18
 updated: 2026-10-18

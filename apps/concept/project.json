@@ -4,6 +4,6 @@
   "db": "none",
   "uses": [],
   "exposes": {},
-  "status": "poc",
+  "status": "live",
   "ports": { "web": 5175, "api": 8789 }
 }

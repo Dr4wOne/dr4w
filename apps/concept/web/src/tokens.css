@@ -15,14 +15,9 @@
 
 :root {
   --ground: #070b0e;
-  --plate-1: #262627;
-  --plate-2: #313235;
-  --plate-3: #565453;
-  --plate-4: #8b847f;
   --ink: #e6e4e1;
   --ink-soft: #a39c97;
   --signal: #e94d4b;
-  --signal-deep: #be2924;
 
   /* DR4W rig (v2 rig spec: k-means on the character-sheet figure; cyan from the game palette) */
   --gm-900: #060405;
@@ -101,11 +96,9 @@
   --step-body: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
   --step-lead: clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem);
   --step-head: clamp(2rem, 1.3rem + 3.2vw, 4rem);
-  --step-monument: clamp(5.5rem, 35vw, 34rem);
 
   --margin: clamp(1rem, 2vw, 2rem);
   --section-gap: clamp(6rem, 12vw, 13rem);
-  --plate-edge: 1.5px;
 
   --ease-snap: cubic-bezier(0.2, 0.9, 0.3, 1);
   --ease-settle: cubic-bezier(0.3, 1.4, 0.5, 1);

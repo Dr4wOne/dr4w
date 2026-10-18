@@ -93,6 +93,7 @@ export class Dr4wRig extends HTMLElement {
   #dashUntil = 0
   #blink = 0
   #resize?: ResizeObserver
+  #pulses = new Map<string, number>() // one running timer per part + attribute
 
   connectedCallback() {
     if (this.childElementCount) return
@@ -292,10 +293,15 @@ export class Dr4wRig extends HTMLElement {
 
   #pulse(el: HTMLElement | undefined, attr: string, ms: number) {
     if (!el) return
+    const key = `${el.className}|${attr}`
+    clearTimeout(this.#pulses.get(key))
     el.removeAttribute(attr)
     void el.offsetWidth // restart the CSS animation
     el.setAttribute(attr, '')
-    window.setTimeout(() => el.removeAttribute(attr), ms)
+    this.#pulses.set(
+      key,
+      window.setTimeout(() => el.removeAttribute(attr), ms),
+    )
   }
 
   #say(text: string) {
