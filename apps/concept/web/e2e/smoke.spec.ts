@@ -15,8 +15,17 @@ test('the app renders the title lockup', async ({ page }) => {
 
 test('DR4W can be played from the on-screen pad', async ({ page }) => {
   await page.goto('/')
+  // The jump is over in under a second, so listen for it instead of polling the attribute.
+  const jumped = page.evaluate(
+    () =>
+      new Promise((done) =>
+        document.querySelector('dr4w-rig')?.addEventListener('rigstate', (e) => {
+          if ((e as CustomEvent).detail.state === 'jump') done(true)
+        }),
+      ),
+  )
   await page.getByRole('button', { name: 'Jump', exact: true }).click()
-  await expect(page.locator('dr4w-rig .dr4w')).toHaveAttribute('data-state', /jump|fall|land/)
+  expect(await jumped).toBe(true)
 })
 
 test('direct execute-api calls without the origin secret are rejected', async ({ request }) => {
