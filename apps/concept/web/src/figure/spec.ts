@@ -1,0 +1,10 @@
+// Lazy chunk for the Spec section: the character-sheet pieces (Daniel's pixel CSS, ~42 KB gz).
+import './pixel/pixel-tokens.css'
+import './pixel/pieces/head-front.generated.css'
+import './pixel/pieces/head-side.generated.css'
+import './pixel/pieces/skull.generated.css'
+import './pixel/pieces/cannon-long.generated.css'
+import './pixel/pieces/cannon-short.generated.css'
+import './pixel/pieces/view-front.generated.css'
+import './pixel/pieces/view-back.generated.css'
+import './spec.css'

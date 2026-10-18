@@ -1,6 +1,6 @@
 # Status
 
-**Last updated:** 2026-10-17 · as of branch `docs/home-hub` (PR #17)
+**Last updated:** 2026-10-18 · as of branch `launch/concept`
 Update this file with `/handoff` at the end of every session.
 
 ## Live projects
@@ -8,6 +8,7 @@ Update this file with `/handoff` at the end of every session.
 |---|---|---|---|
 | hello | https://hello.dr4w.io | Notes CRUD; publishes `Note.Created.v1` | 2026-10-15 |
 | echo | https://echo.dr4w.io | Counts hello's `Note.Created.v1` events | 2026-10-15 |
+| concept | https://concept.dr4w.io | DR4W / All Iron Hunt teaser: playable pixel-CSS DR4W + device figures, story, level select, Spec (`ideas/concept/`) | 2026-10-18 |
 
 Outside this repo: **dr4w home**, the open-source home hub kit ([Dr4wOne/dr4w-home](https://github.com/Dr4wOne/dr4w-home), public since 2026-10-17; showcase in demo mode live at https://home.dr4w.io, deployed by that repo's CI). The owner's hub runs from it at home ([guides/my-home-hub.md](guides/my-home-hub.md), [ADR 0018](decisions/0018-home-hub-outside-the-monorepo.md)).
 
@@ -24,13 +25,16 @@ acceptance criteria: `docs/SPEC.md` §9. Dry run: `ideas/guestbook/` (idea → l
 ## Next up
 1. **~2026-10-22:** check real idle cost in Cost Explorer (`docs/costs.md`); replace the estimate.
 2. When the Lambda quota reaches 1000 (AWS case open): set `reserved_concurrency = 10` in each `module "api"` (ADR 0009).
-3. First real idea through `/idea`.
+3. concept v2b: device figures 04–07 (blade, core, helmet, thrusters, antenna) on `apps/concept/web/src/figure/device.ts`.
 4. dr4w home Part B (Nintendo Switch 1 and 2) starts after Part A is approved; status lives in the kit's own `docs/STATUS.md`.
 5. Exclude `home.dr4w.io` and `blog.dr4w.io` from Cloudflare Web Analytics automatic setup: its injected beacon is blocked by their CSP and logs a console error.
 
 ## Known issues / gaps vs spec
 | Item | Impact | Where |
 |---|---|---|
+| concept: boss cards are placeholder CSS silhouettes | Weakest part of the page until boss art exists | `apps/concept/web/src/app.css` `.boss-shape` |
+| concept: mobile LCP 2.7 s (target 1.8 s); the page renders after the JS bundle | Lighthouse perf still 96; fix = prerender the HTML at build | `apps/concept/web` build |
+| concept: pixel rig files are generated outside this repo (Daniel's `img2css.py`, private sheet) | Can't regenerate from the repo alone | `apps/concept/web/src/figure/pixel/*.generated.css` |
 | `gha-sandbox` / `gha-prod` (not dr4w) trust every `Dr4wOne` repo (`gha-sandbox` also any `main`) with PowerUserAccess | Shared-account risk — **accepted for now** (2026-10-15) | Narrowed policies (blog + mockshop environments only) were prepared; apply when ready |
 | Lambda quota 10 → reserved concurrency off | No per-project concurrency cap (throttling still on) | ADR 0009 |
 | SQS messages are not routed by `createLambdaHandler` | `queue` module needs a project-local handler | `packages/api-kit/src/events.ts` |

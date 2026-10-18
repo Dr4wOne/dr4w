@@ -1,0 +1,137 @@
+/* Spec section: the character sheet rebuilt (Daniel's demo layout, page tokens). */
+.spec-lead {
+  max-width: 60ch;
+  color: var(--ink-soft);
+}
+.sheet {
+  display: grid;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+@media (min-width: 980px) {
+  .sheet {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .sheet .span2 {
+    grid-column: span 2;
+  }
+}
+.panel {
+  padding: 1.1rem 1.25rem 1.3rem;
+  background: var(--gm-900);
+  overflow: hidden;
+}
+.panel h3 {
+  margin: 0 0 0.9rem;
+  font-size: var(--step-small);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.panel .art,
+.weapons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+  align-items: end;
+  justify-content: center;
+}
+.piece {
+  margin: 0;
+}
+.sheet-logo {
+  display: grid;
+  place-items: center;
+}
+.sheet-logo .lk-iron {
+  white-space: nowrap;
+  font-size: clamp(1rem, 2vw, 1.4rem);
+}
+.sheet-logo .lk-dr4w {
+  font-size: clamp(3rem, 6vw, 5rem);
+}
+.sheet-logo .lk-dr4w::before,
+.sheet-logo .lk-dr4w::after {
+  display: none;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  width: auto;
+  margin-top: 1rem;
+  min-height: 44px;
+  padding: 0 0.9rem;
+  border: 0;
+  background: var(--gm-800);
+  font-family: var(--font-hud);
+  cursor: pointer;
+}
+.chip[aria-pressed="true"] {
+  box-shadow: inset 3px 0 0 var(--accent-cyan);
+}
+.unit {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0;
+  text-transform: uppercase;
+}
+.unit div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+.unit dt {
+  color: var(--ink-soft);
+}
+.unit dd {
+  margin: 0;
+}
+.unit dd.on {
+  color: var(--glow-red-hot);
+}
+.weapons .piece:last-child {
+  animation: extend calc(var(--dur-idle) * 0.9) steps(6) infinite alternate;
+}
+@keyframes extend {
+  to {
+    transform: translateX(-12%);
+  }
+}
+.weapons-note {
+  margin: 0.4rem 0 0;
+  text-align: right;
+  font-size: var(--step-small);
+  color: var(--glow-red-hot);
+}
+.sub {
+  margin: 0.9rem 0 0.4rem;
+  font-size: var(--step-small);
+  color: var(--ink-soft);
+}
+.swatches {
+  font-family: var(--font);
+  font-variant-numeric: tabular-nums;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+  gap: 0.4rem 0.8rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--step-small);
+}
+.swatches li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.swatches i {
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+  box-shadow: inset 0 0 0 1px rgb(230 228 225 / 0.1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .weapons .piece:last-child {
+    animation: none;
+  }
+}

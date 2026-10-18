@@ -1,0 +1,8 @@
+{
+  "name": "concept",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx ../../scripts/dev.ts concept"
+  }
+}
